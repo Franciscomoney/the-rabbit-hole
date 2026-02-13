@@ -1,12 +1,15 @@
 # The Rabbit Hole — The Infinite Interactive Audiobook
 
 > **NVIDIA GTC 2026 Golden Ticket Submission**
+> Created by **Francisco Cordoba Otalora**
 
 Turn any book into a fully voiced, interactive choose-your-own-adventure experience — powered entirely by NVIDIA AI.
 
 Upload a PDF or TXT, and Rabbit Hole transforms it into an immersive audio narrative where **you** make the choices. Every playthrough is unique. Every decision reshapes the story.
 
-**Live demo:** [rabbithole.experiment.franciscocordobaotalora.com](https://rabbithole.experiment.franciscocordobaotalora.com)
+[![Watch the demo](https://img.youtube.com/vi/sxpsRP6lS40/maxresdefault.jpg)](https://youtu.be/sxpsRP6lS40)
+
+**Watch the demo:** [youtu.be/sxpsRP6lS40](https://youtu.be/sxpsRP6lS40)
 
 ---
 
