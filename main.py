@@ -450,7 +450,7 @@ async def upload_book(file: UploadFile = File(...)):
             }) + "\n"
 
             # Process embeddings in batches and report progress
-            batch_size = 5  # Smaller batches for faster feedback
+            batch_size = 50  # NVIDIA NIM supports up to 96 inputs per request
             all_embeddings = []
 
             for i in range(0, len(chunks), batch_size):

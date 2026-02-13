@@ -156,8 +156,8 @@
         .section-head {
             display: flex;
             justify-content: space-between;
-            align-items: baseline;
-            padding: 20px 20px 14px;
+            align-items: center;
+            padding: 16px 20px 10px;
         }
         .section-label {
             font-family: 'Merriweather', serif;
@@ -171,13 +171,6 @@
             font-weight: 400;
             margin-left: 8px;
         }
-        .section-link {
-            font-size: 0.8rem;
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 500;
-            cursor: pointer;
-        }
 
         /* Book grid - 2 columns */
         .book-grid {
@@ -186,6 +179,62 @@
             gap: 16px;
             padding: 0 20px;
         }
+
+        .search-toggle-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 1px solid var(--glass-border);
+            background: rgba(255,255,255,0.06);
+            color: var(--text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .search-toggle-btn:active { transform: scale(0.9); }
+        .search-toggle-btn.active { color: var(--primary); border-color: var(--primary); background: rgba(163,255,172,0.1); }
+
+        /* Search bar */
+        .search-bar {
+            display: none;
+            align-items: center;
+            margin: 0 20px 10px;
+            padding: 0 14px;
+            height: 42px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid var(--glass-border);
+            border-radius: 14px;
+            gap: 10px;
+            transition: border-color 0.2s;
+        }
+        .search-bar.active { display: flex; }
+        .search-bar:focus-within { border-color: var(--primary); }
+
+        .search-bar-icon { color: var(--text-muted); flex-shrink: 0; }
+
+        .search-input {
+            flex: 1;
+            background: none;
+            border: none;
+            color: var(--text-main);
+            font-size: 0.88rem;
+            font-family: inherit;
+            outline: none;
+        }
+        .search-input::placeholder { color: var(--text-muted); }
+
+        .search-clear {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0 2px;
+            display: none;
+        }
+        .search-clear.visible { display: block; }
 
         .book-cell {
             cursor: pointer;
@@ -267,8 +316,8 @@
             margin-top: 3px;
         }
 
-        /* Book list rows */
-        .book-list { padding: 0 20px; }
+        /* Book list rows - primary view */
+        .book-list { padding: 0 16px; }
 
         .book-row {
             display: flex;
@@ -524,30 +573,108 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 16px;
+            gap: 0;
         }
         .upload-overlay.active { display: flex; }
 
-        .upload-spinner { font-size: 3rem; animation: float 2s ease-in-out infinite; }
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+        /* Scanner animation (upload) */
+        .scanner-stage {
+            position: relative;
+            width: 180px;
+            height: 270px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 32px;
         }
 
-        .upload-status {
-            font-size: 0.92rem;
-            font-weight: 500;
-            text-align: center;
-            padding: 0 40px;
+        .scanner-book {
+            width: 130px;
+            height: 195px;
+            background: linear-gradient(135deg, #1a3a2a, #0f1c15);
+            border-radius: 8px;
+            box-shadow: 0 0 40px rgba(0,0,0,0.8);
+            position: relative;
+            z-index: 2;
+            overflow: hidden;
+            border: 1px solid rgba(163, 255, 172, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .scanner-book-icon {
+            font-size: 2.5rem;
+            opacity: 0.3;
+        }
+
+        .scanner-laser {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 4px;
+            background: var(--primary);
+            box-shadow: 0 0 20px 2px var(--primary);
+            animation: scanLaser 2.5s ease-in-out infinite;
+            z-index: 5;
+        }
+
+        @keyframes scanLaser {
+            0% { top: 0%; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+
+        .radar-ring {
+            position: absolute;
+            border: 1px solid var(--primary);
+            border-radius: 50%;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            z-index: 1;
+        }
+
+        .ring-1 { animation: ripple 3s linear infinite; }
+        .ring-2 { animation: ripple 3s linear infinite; animation-delay: 1s; }
+        .ring-3 { animation: ripple 3s linear infinite; animation-delay: 2s; }
+
+        @keyframes ripple {
+            0% { width: 80px; height: 80px; opacity: 0.6; border-width: 2px; }
+            100% { width: 400px; height: 400px; opacity: 0; border-width: 0px; }
+        }
+
+        .upload-status-container { text-align: center; z-index: 10; }
+
+        .upload-status-title {
+            font-family: 'Merriweather', serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 10px;
             color: var(--text-main);
         }
 
+        .upload-status {
+            font-family: 'Courier New', monospace;
+            color: var(--primary);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            opacity: 0.9;
+        }
+        .upload-status::after {
+            content: '_';
+            animation: blinkCursor 0.8s infinite;
+        }
+
+        @keyframes blinkCursor { 50% { opacity: 0; } }
+
         .upload-bar {
             width: 180px;
-            height: 4px;
+            height: 3px;
             background: rgba(255,255,255,0.1);
             border-radius: 2px;
             overflow: hidden;
+            margin-top: 16px;
         }
 
         .upload-bar-fill {
@@ -1137,22 +1264,91 @@
         .play-btn:hover { transform: scale(1.05); }
         .play-btn svg { width: 22px; height: 22px; }
 
-        /* Loading overlay */
+        /* Loading overlay (neural weave) */
         .loading {
             display: none;
             position: absolute;
             inset: 0;
             background: rgba(5, 10, 7, 0.95);
+            background-image: radial-gradient(circle, transparent 20%, rgba(0,0,0,0.6) 100%);
             backdrop-filter: blur(10px);
             justify-content: center;
             align-items: center;
             z-index: 100;
             flex-direction: column;
-            gap: 14px;
+            gap: 0;
         }
         .loading.active { display: flex; }
-        .loading-icon { font-size: 2.2rem; animation: float 2s ease-in-out infinite; }
-        .loading-label { color: rgba(255,255,255,0.5); font-size: 0.85rem; }
+
+        .weave-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .weave-thread {
+            position: absolute;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            box-shadow: 0 0 15px rgba(163, 255, 172, 0.2);
+        }
+
+        .weave-thread-1 {
+            width: 100%; height: 100%;
+            border-top-color: var(--primary);
+            animation: weaveSpinRight 1s linear infinite;
+        }
+
+        .weave-thread-2 {
+            width: 70%; height: 70%;
+            border-left-color: #fff;
+            border-width: 3px;
+            animation: weaveSpinLeft 2.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+            opacity: 0.8;
+        }
+
+        .weave-thread-3 {
+            width: 140%; height: 140%;
+            border-top-color: rgba(163, 255, 172, 0.4);
+            border-right-color: rgba(163, 255, 172, 0.4);
+            animation: weaveSpinRight 4s linear infinite;
+        }
+
+        .weave-core {
+            width: 12px;
+            height: 12px;
+            background: #fff;
+            border-radius: 50%;
+            box-shadow: 0 0 30px 10px var(--primary);
+            animation: heartbeat 1.5s ease-in-out infinite;
+        }
+
+        @keyframes weaveSpinRight { 100% { transform: rotate(360deg); } }
+        @keyframes weaveSpinLeft { 100% { transform: rotate(-360deg); } }
+        @keyframes heartbeat {
+            0% { transform: scale(1); opacity: 0.7; }
+            50% { transform: scale(1.8); opacity: 1; box-shadow: 0 0 50px 15px var(--primary); }
+            100% { transform: scale(1); opacity: 0.7; }
+        }
+
+        .loading-label {
+            font-family: 'Courier New', monospace;
+            color: var(--primary);
+            font-size: 0.75rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            text-align: center;
+            animation: fadeIO 2s infinite;
+        }
+
+        @keyframes fadeIO {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
 
         /* ========== TAB BAR (Floating Glass Pill) ========== */
         .tab-bar {
@@ -1367,6 +1563,14 @@
                 <div class="home-scroll">
                     <div class="section-head">
                         <div><span class="section-label">Your Library</span><span class="section-count" id="bookCount"></span></div>
+                        <button class="search-toggle-btn" id="searchToggleBtn">
+                            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" d="m21 21-4.35-4.35"/></svg>
+                        </button>
+                    </div>
+                    <div class="search-bar" id="searchBar">
+                        <svg class="search-bar-icon" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" d="m21 21-4.35-4.35"/></svg>
+                        <input type="text" class="search-input" id="searchInput" placeholder="Search books...">
+                        <button class="search-clear" id="searchClear">&times;</button>
                     </div>
                     <div class="book-grid" id="bookGrid"></div>
 
@@ -1430,10 +1634,21 @@
                 </button>
 
                 <div class="upload-overlay" id="uploadOverlay">
-                    <div class="upload-spinner" id="progressSpinner">📖</div>
-                    <div class="upload-status" id="progressText">Processing your book...</div>
-                    <div class="upload-bar">
-                        <div class="upload-bar-fill" id="progressBarFill"></div>
+                    <div class="scanner-stage">
+                        <div class="radar-ring ring-1"></div>
+                        <div class="radar-ring ring-2"></div>
+                        <div class="radar-ring ring-3"></div>
+                        <div class="scanner-book">
+                            <div class="scanner-laser"></div>
+                            <div class="scanner-book-icon">📖</div>
+                        </div>
+                    </div>
+                    <div class="upload-status-container">
+                        <div class="upload-status-title">Ingesting Story</div>
+                        <div class="upload-status" id="progressText">Initializing scanner...</div>
+                        <div class="upload-bar">
+                            <div class="upload-bar-fill" id="progressBarFill"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1577,8 +1792,13 @@
             </div>
 
             <div class="loading" id="loadingOverlay">
-                <div class="loading-icon">✨</div>
-                <div class="loading-label">Creating your adventure...</div>
+                <div class="weave-container">
+                    <div class="weave-thread weave-thread-1"></div>
+                    <div class="weave-thread weave-thread-2"></div>
+                    <div class="weave-thread weave-thread-3"></div>
+                    <div class="weave-core"></div>
+                </div>
+                <div class="loading-label" id="loadingLabel">Initializing Nemotron Engine...</div>
             </div>
         </div>
 
@@ -1594,50 +1814,50 @@
             </button>
         </div>
         <input type="file" id="fileInput" class="file-input" accept=".pdf,.txt">
-    </div>
 
-    <!-- Choice Modal (Slide-up Decision Sheet) -->
-    <div class="modal-bg choice-confirm" id="choiceModal">
-        <div class="modal">
-            <button class="choice-close" onclick="closeChoiceModal()">&times;</button>
-            <div class="choice-number" id="choiceModalNumber">1</div>
-            <div class="choice-text" id="choiceModalText">Choice text</div>
-            <div class="modal-btns">
-                <button class="modal-btn cancel" onclick="closeChoiceModal()">Cancel</button>
-                <button class="modal-btn confirm" onclick="confirmChoice()">Confirm Choice</button>
+        <!-- Choice Modal (Slide-up Decision Sheet) -->
+        <div class="modal-bg choice-confirm" id="choiceModal">
+            <div class="modal">
+                <button class="choice-close" onclick="closeChoiceModal()">&times;</button>
+                <div class="choice-number" id="choiceModalNumber">1</div>
+                <div class="choice-text" id="choiceModalText">Choice text</div>
+                <div class="modal-btns">
+                    <button class="modal-btn cancel" onclick="closeChoiceModal()">Cancel</button>
+                    <button class="modal-btn confirm" onclick="confirmChoice()">Confirm Choice</button>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- Edit Modal -->
-    <div class="modal-bg" id="editModal">
-        <div class="modal">
-            <div class="modal-head">Edit Book</div>
-            <input type="hidden" id="editBookId">
-            <label class="modal-label">Title</label>
-            <input type="text" class="modal-input" id="editTitle" placeholder="Book title">
-            <label class="modal-label">Author</label>
-            <input type="text" class="modal-input" id="editAuthor" placeholder="Author name">
-            <div class="modal-btns">
-                <button class="modal-btn cancel" onclick="closeEditModal()">Cancel</button>
-                <button class="modal-btn confirm" onclick="saveBookEdit()">Save</button>
+        <!-- Edit Modal -->
+        <div class="modal-bg" id="editModal">
+            <div class="modal">
+                <div class="modal-head">Edit Book</div>
+                <input type="hidden" id="editBookId">
+                <label class="modal-label">Title</label>
+                <input type="text" class="modal-input" id="editTitle" placeholder="Book title">
+                <label class="modal-label">Author</label>
+                <input type="text" class="modal-input" id="editAuthor" placeholder="Author name">
+                <div class="modal-btns">
+                    <button class="modal-btn cancel" onclick="closeEditModal()">Cancel</button>
+                    <button class="modal-btn confirm" onclick="saveBookEdit()">Save</button>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- Delete Confirmation Modal -->
-    <div class="modal-bg" id="deleteModal">
-        <div class="modal">
-            <div class="delete-modal-icon">
-                <svg width="32" height="32" fill="none" viewBox="0 0 24 24" stroke="#ff6b6b" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
-            </div>
-            <div class="modal-head">Delete this book?</div>
-            <div class="delete-modal-msg" id="deleteModalMsg">This will permanently remove the book and all its data. This action cannot be undone.</div>
-            <label class="modal-label">Type DELETE to confirm</label>
-            <input type="text" class="modal-input" id="deleteConfirmInput" placeholder="DELETE" autocomplete="off" spellcheck="false">
-            <div class="modal-btns">
-                <button class="modal-btn cancel" onclick="closeDeleteModal()">Cancel</button>
-                <button class="modal-btn confirm delete-confirm-btn" id="deleteConfirmBtn" onclick="confirmDelete()" disabled>Delete</button>
+        <!-- Delete Confirmation Modal -->
+        <div class="modal-bg" id="deleteModal">
+            <div class="modal">
+                <div class="delete-modal-icon">
+                    <svg width="32" height="32" fill="none" viewBox="0 0 24 24" stroke="#ff6b6b" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+                </div>
+                <div class="modal-head">Delete this book?</div>
+                <div class="delete-modal-msg" id="deleteModalMsg">This will permanently remove the book and all its data. This action cannot be undone.</div>
+                <label class="modal-label">Type DELETE to confirm</label>
+                <input type="text" class="modal-input" id="deleteConfirmInput" placeholder="DELETE" autocomplete="off" spellcheck="false">
+                <div class="modal-btns">
+                    <button class="modal-btn cancel" onclick="closeDeleteModal()">Cancel</button>
+                    <button class="modal-btn confirm delete-confirm-btn" id="deleteConfirmBtn" onclick="confirmDelete()" disabled>Delete</button>
+                </div>
             </div>
         </div>
     </div>
@@ -1670,10 +1890,35 @@
         const detailScreen = document.getElementById('detailScreen');
         const readerScreen = document.getElementById('readerScreen');
         const uploadOverlay = document.getElementById('uploadOverlay');
-        const progressSpinner = document.getElementById('progressSpinner');
+        const scannerBookIcon = document.querySelector('.scanner-book-icon');
         const progressText = document.getElementById('progressText');
         const progressBarFill = document.getElementById('progressBarFill');
+        const uploadStatusTitle = document.querySelector('.upload-status-title');
         const fileInput = document.getElementById('fileInput');
+
+        // Upload scanner cycling messages (from animation)
+        const uploadMessages = [
+            "Parsing PDF structure...",
+            "Identifying protagonist...",
+            "Mapping villain motives...",
+            "Detecting plot twists...",
+            "Analyzing narrative arcs...",
+            "Scanning chapter boundaries..."
+        ];
+        let uploadMsgIdx = 0;
+        let uploadMsgInterval = null;
+
+        function startUploadCycler() {
+            uploadMsgIdx = 0;
+            progressText.textContent = 'Initializing scanner...';
+            uploadMsgInterval = setInterval(() => {
+                progressText.textContent = uploadMessages[uploadMsgIdx];
+                uploadMsgIdx = (uploadMsgIdx + 1) % uploadMessages.length;
+            }, 2000);
+        }
+        function stopUploadCycler() {
+            if (uploadMsgInterval) { clearInterval(uploadMsgInterval); uploadMsgInterval = null; }
+        }
         const bookGrid = document.getElementById('bookGrid');
         const bookList = document.getElementById('bookList');
         const backBtn = document.getElementById('backBtn');
@@ -1688,8 +1933,33 @@
         const pauseIcon = document.getElementById('pauseIcon');
         const choiceIcons = document.getElementById('choiceIcons');
         const loadingOverlay = document.getElementById('loadingOverlay');
+        const loadingLabel = document.getElementById('loadingLabel');
         const editModal = document.getElementById('editModal');
         const choiceModal = document.getElementById('choiceModal');
+
+        // Loading text cycler
+        const loadingPhrases = [
+            "Querying NeMo Embeddings...",
+            "Retrieving Story Context...",
+            "Fracturing Timeline...",
+            "Calculating Survival Odds...",
+            "Generating 3 Possible Futures...",
+            "Synthesizing Narrative Path..."
+        ];
+        let loadingTextIdx = 0;
+        let loadingTextInterval = null;
+
+        function startLoadingText() {
+            loadingTextIdx = 0;
+            loadingLabel.textContent = 'Initializing Nemotron Engine...';
+            loadingTextInterval = setInterval(() => {
+                loadingLabel.textContent = loadingPhrases[loadingTextIdx];
+                loadingTextIdx = (loadingTextIdx + 1) % loadingPhrases.length;
+            }, 1800);
+        }
+        function stopLoadingText() {
+            if (loadingTextInterval) { clearInterval(loadingTextInterval); loadingTextInterval = null; }
+        }
 
         // ============ TAB NAVIGATION ============
         const mainTabBar = document.getElementById('mainTabBar');
@@ -1752,6 +2022,7 @@
         async function handleFile(file) {
             if (!file.name.match(/\.(pdf|txt)$/i)) { alert('PDF or TXT only'); return; }
             uploadOverlay.classList.add('active');
+            startUploadCycler();
             const formData = new FormData();
             formData.append('file', file);
 
@@ -1772,8 +2043,8 @@
                         if (!line.trim()) continue;
                         try {
                             const data = JSON.parse(line);
-                            if (data.icon) progressSpinner.textContent = data.icon;
-                            if (data.message) progressText.textContent = data.message;
+                            if (data.icon && scannerBookIcon) scannerBookIcon.textContent = data.icon;
+                            if (data.message) { stopUploadCycler(); progressText.textContent = data.message; }
                             if (data.progress !== undefined) progressBarFill.style.width = data.progress + '%';
                             if (data.stage === 'complete' && data.success) {
                                 sessionId = data.session_id;
@@ -1789,7 +2060,8 @@
                     }
                 }
             } catch (error) {
-                progressSpinner.textContent = '😱';
+                stopUploadCycler();
+                if (scannerBookIcon) scannerBookIcon.textContent = '😱';
                 progressText.textContent = error.message || 'Upload failed';
                 setTimeout(resetUpload, 3000);
             }
@@ -1798,8 +2070,8 @@
         function resetUpload() {
             uploadOverlay.classList.remove('active');
             progressBarFill.style.width = '0%';
-            progressText.textContent = 'Processing your book...';
-            progressSpinner.textContent = '📖';
+            progressText.textContent = 'Initializing scanner...';
+            if (scannerBookIcon) scannerBookIcon.textContent = '📖';
             pendingFile = null;
             uploadDropZone.classList.remove('has-file');
             uploadDropTitle.textContent = 'Tap to Upload';
@@ -1828,12 +2100,26 @@
             'linear-gradient(145deg, #5a7a20 0%, #3d5510 50%, #223308 100%)',
         ];
 
+        let allBooks = [];
+
         function renderLibrary(books) {
+            allBooks = books;
+            renderBookList(books);
+        }
+
+        function renderBookList(books) {
             const countEl = document.getElementById('bookCount');
             countEl.textContent = books.length > 0 ? `${books.length} Books` : '';
 
-            if (books.length === 0) {
+            if (books.length === 0 && allBooks.length === 0) {
                 bookGrid.innerHTML = `<div class="empty" style="grid-column: 1/-1"><div class="empty-icon">📚</div><div class="empty-text">No books yet.<br>Tap + to upload your first adventure!</div></div>`;
+                bookList.innerHTML = '';
+                document.getElementById('allBooksHead').style.display = 'none';
+                return;
+            }
+
+            if (books.length === 0) {
+                bookGrid.innerHTML = `<div class="empty" style="grid-column: 1/-1"><div class="empty-icon">🔍</div><div class="empty-text">No books match your search</div></div>`;
                 bookList.innerHTML = '';
                 document.getElementById('allBooksHead').style.display = 'none';
                 return;
@@ -1857,7 +2143,7 @@
                 </div>`;
             }).join('');
 
-            // List view (all books if more than 6)
+            // List view (remaining books)
             if (books.length > 6) {
                 document.getElementById('allBooksHead').style.display = 'flex';
                 bookList.innerHTML = books.slice(6).map((book, i) => {
@@ -1880,6 +2166,43 @@
                 bookList.innerHTML = '';
             }
         }
+
+        // Search
+        const searchToggleBtn = document.getElementById('searchToggleBtn');
+        const searchBar = document.getElementById('searchBar');
+        const searchInput = document.getElementById('searchInput');
+        const searchClear = document.getElementById('searchClear');
+
+        searchToggleBtn.addEventListener('click', () => {
+            const open = searchBar.classList.toggle('active');
+            searchToggleBtn.classList.toggle('active', open);
+            if (open) {
+                searchInput.focus();
+            } else {
+                searchInput.value = '';
+                searchClear.classList.remove('visible');
+                renderBookList(allBooks);
+            }
+        });
+
+        searchInput.addEventListener('input', () => {
+            const q = searchInput.value.trim().toLowerCase();
+            searchClear.classList.toggle('visible', q.length > 0);
+            if (!q) { renderBookList(allBooks); return; }
+            const filtered = allBooks.filter(b =>
+                b.title.toLowerCase().includes(q) ||
+                (b.author || '').toLowerCase().includes(q) ||
+                (b.tags || '').toLowerCase().includes(q)
+            );
+            renderBookList(filtered);
+        });
+
+        searchClear.addEventListener('click', () => {
+            searchInput.value = '';
+            searchClear.classList.remove('visible');
+            renderBookList(allBooks);
+            searchInput.focus();
+        });
 
         function esc(s) { return (s || '').replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
 
@@ -2009,7 +2332,7 @@
                     body: JSON.stringify({ title, author: author || null })
                 });
                 closeEditModal();
-                // Update detail screen if open
+                // Update detail screen immediately
                 bookTitle = title;
                 bookAuthor = author;
                 const coverTitleEl = document.getElementById('detailCoverTitle');
@@ -2017,6 +2340,7 @@
                 const coverAuthorEl = document.getElementById('detailCoverAuthor');
                 if (coverAuthorEl) coverAuthorEl.textContent = author || 'Unknown';
                 document.getElementById('detailTitle').textContent = title;
+                document.getElementById('detailAuthor').innerHTML = `<svg viewBox="0 0 24 24" fill="currentColor" style="width:14px;height:14px;color:var(--accent)"><circle cx="12" cy="12" r="10"/></svg> ${author || 'Unknown'}`;
                 loadLibrary();
             } catch (e) { alert(e.message); }
         }
@@ -2077,6 +2401,7 @@
         async function sendMessage(userInput, isStart = false) {
             stopAudio();
             loadingOverlay.classList.add('active');
+            startLoadingText();
             disableChoices();
 
             try {
@@ -2097,11 +2422,13 @@
                 storyText.innerHTML = '<span class="line current">Something went wrong. Try again.</span>';
                 currentChoices = ['Try again', 'Go back', 'Restart'];
                 enableChoices();
+                stopLoadingText();
                 loadingOverlay.classList.remove('active');
             }
         }
 
         function displayStory(text) {
+            stopLoadingText();
             loadingOverlay.classList.remove('active');
 
             const choiceRegex = /(\d)[.)]\s*(.+?)(?=\n\d[.)]|\n*$)/gs;

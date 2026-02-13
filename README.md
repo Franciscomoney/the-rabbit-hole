@@ -94,7 +94,9 @@ Upload Book → Chunk & Embed → Play Adventure → Listen & Choose → Story B
 - **Choose-your-own-adventure** — 3 choices at every turn, confirmed via slide-up modal
 - **Session persistence** — continue where you left off
 - **Voice input** — speak your choices (optional, requires Whisper STT endpoint)
+- **Search** — real-time search across titles, authors, and tags
 - **Share** — native Web Share API on mobile, clipboard fallback on desktop
+- **Custom loading animations** — book scanner (upload) and neural weave spinner (adventure)
 - **Dark glassmorphism UI** — NVIDIA green accent, frosted glass cards, smooth animations
 - **No build step** — pure HTML/CSS/JS frontend, just serve it
 - **Zero dependencies frontend** — no React, no npm, no bundler
