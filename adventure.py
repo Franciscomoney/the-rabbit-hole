@@ -14,27 +14,22 @@ logger = logging.getLogger(__name__)
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 NEMOTRON_MODEL = "nvidia/nemotron-3-nano-30b-a3b"
-NEMOTRON_ADVANCED = "nvidia/llama-3.3-nemotron-super-49b-v1.5"
 
-SYSTEM_PROMPT = """You are the Narrator of a choose-your-own-adventure book. You MUST use the book content provided to create the story.
+SYSTEM_PROMPT = """You are a choose-your-own-adventure narrator. Use the book content provided. Write in second person ("You...").
 
-RULES:
-- Read the BOOK CONTENT provided and create narrative BASED ON it
-- Use characters, settings, and events FROM THE BOOK
-- Write in second person ("You...")
-- Each choice you offer must lead to a DIFFERENT direction in the story
-- Choice 1 should push the story forward (action/courage)
-- Choice 2 should explore sideways (investigation/curiosity)
-- Choice 3 should pull back or take a cautious/unexpected path
+Write 3 paragraphs of narrative (3-4 sentences each) based on the book content, then give exactly 3 numbered choices.
 
-OUTPUT FORMAT (follow this exactly):
-Write 3 paragraphs of narrative (3-4 sentences each), then exactly 3 numbered choices.
+Each choice must:
+- Start with "You" and describe a specific action (8-12 words)
+- Reference something from the scene (a character, place, or object)
+- Be plain text only (no bold, no asterisks, no markdown)
 
-1. [bold action — advances the main plot]
-2. [explore/investigate — uncovers details or side content]
-3. [cautious/retreat — takes a different path through the story]
+Example choices:
+1. You grab the lantern and rush toward the screams in the cellar
+2. You whisper to Elena and search the desk for the coded letter
+3. You slip out the back door before the soldiers notice you
 
-IMPORTANT: Your narrative MUST reference specific elements from the book content. Each choice must be meaningfully different — they determine which part of the book the reader experiences next."""
+Choice 1 = bold action, Choice 2 = investigate/explore, Choice 3 = cautious/retreat."""
 
 async def find_branching_chunks(book_id: str, choice_text: str, current_chunk: int, total_chunks: int) -> Dict[str, int]:
     """Use semantic search to find the best chunk for a given choice.
@@ -123,78 +118,6 @@ async def find_three_paths(book_id: str, choices: List[str], current_chunk: int,
     return paths
 
 
-async def enhance_choices(response_text: str) -> str:
-    """Use Nemotron Super 49B to rewrite the 3 choices into vivid, compelling options."""
-    import re
-    # Extract the choices from the response
-    choice_pattern = re.compile(r'(\d)[.)]\s*(.+?)(?=\n\d[.)]|\n*$)', re.DOTALL)
-    matches = list(choice_pattern.finditer(response_text))
-
-    if len(matches) < 2:
-        return response_text  # No choices to enhance
-
-    # Get the narrative part (before choices)
-    first_choice_start = matches[0].start()
-    narrative = response_text[:first_choice_start].strip()
-    original_choices = [m.group(2).strip() for m in matches[:3]]
-
-    logger.info(f"=== ENHANCING CHOICES with {NEMOTRON_ADVANCED} ===")
-    logger.info(f"Original choices: {original_choices}")
-
-    prompt = f"""Rewrite these 3 choose-your-own-adventure choices. Rules:
-- Start each with "You" + an action verb (e.g. "You charge into...", "You whisper to...", "You slip away through...")
-- ONE sentence each, max 15 words
-- Make them vivid, dramatic, and specific — like real book choices
-- No markdown, no bold, no asterisks
-
-Original choices:
-1. {original_choices[0]}
-2. {original_choices[1] if len(original_choices) > 1 else 'Explore the area'}
-3. {original_choices[2] if len(original_choices) > 2 else 'Turn back'}
-
-Respond with ONLY the 3 rewritten choices:
-1.
-2.
-3. """
-
-    try:
-        async with httpx.AsyncClient(timeout=15.0) as client:
-            resp = await client.post(
-                OPENROUTER_URL,
-                headers={
-                    "Authorization": f"Bearer {OPENROUTER_API_KEY}",
-                    "Content-Type": "application/json"
-                },
-                json={
-                    "model": NEMOTRON_ADVANCED,
-                    "messages": [
-                        {"role": "user", "content": prompt}
-                    ],
-                    "temperature": 0.7,
-                    "max_tokens": 80
-                }
-            )
-            resp.raise_for_status()
-            data = resp.json()
-            enhanced = data["choices"][0]["message"]["content"].strip()
-            logger.info(f"=== ENHANCED CHOICES === {enhanced}")
-
-            # Parse enhanced choices
-            enhanced_matches = list(choice_pattern.finditer(enhanced))
-            if len(enhanced_matches) >= 2:
-                enhanced_choices = [m.group(2).strip() for m in enhanced_matches[:3]]
-                # Rebuild the response with enhanced choices
-                result = narrative + "\n\n"
-                for i, choice in enumerate(enhanced_choices):
-                    result += f"{i + 1}. {choice}\n"
-                return result.strip()
-            else:
-                logger.warning("Could not parse enhanced choices, keeping originals")
-                return response_text
-    except Exception as e:
-        logger.warning(f"Choice enhancement failed ({e}), keeping originals")
-        return response_text
-
 
 async def generate_adventure_response(
     book_id: str,
@@ -272,7 +195,7 @@ INSTRUCTIONS: Create your narrative using the characters, settings, and events f
     logger.info(f"Current chunk: {current_chunk_index} -> {new_chunk_index}")
     logger.info(f"History length: {len(conversation_history)}")
 
-    MIN_RESPONSE_LENGTH = 400
+    MIN_RESPONSE_LENGTH = 200
     MAX_RETRIES = 2
     assistant_response = None
 
@@ -318,9 +241,6 @@ Three paths diverge before you. Each leads deeper into the story, but through en
 1. Push forward boldly into the heart of the action
 2. Investigate the mysteries lurking in the shadows
 3. Take the unexpected path — retreat and find another way"""
-
-    # Enhance choices with the advanced model
-    assistant_response = await enhance_choices(assistant_response)
 
     return {
         "response": assistant_response,

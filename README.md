@@ -95,7 +95,7 @@ Upload Book → Chunk & Embed → Play Adventure → Listen & Choose → Story B
 - **Interactive audio playback** — narrated with synchronized text highlighting (Apple Music lyrics style)
 - **Choose-your-own-adventure** — 3 choices at every turn, each routed to different book passages via semantic search
 - **Real branching** — choices use embedding similarity to find the most relevant passage, so every path is unique
-- **Dual-model choices** — Nemotron 30B generates the narrative fast, Nemotron Super 49B rewrites choices into vivid, actionable prompts
+- **Staggered UI** — narrative appears instantly with TTS, choice buttons pop in 2s later while the user reads
 - **Page-turn transitions** — 3D CSS perspective animations between screens, like turning a real book page
 - **App-shell layout** — fixed header with frosted glass, independent container scroll with CSS scroll snap
 - **Session persistence** — continue where you left off

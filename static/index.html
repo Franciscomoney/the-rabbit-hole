@@ -2631,8 +2631,9 @@
             currentLineIndex = 0;
             calculateLineTimings();
             renderStoryLines(true);
-            enableChoices();
 
+            // Show narrative + start TTS immediately, choices appear after delay
+            disableChoices();
             estimatedDuration = Math.max(5, Math.ceil(narrative.split(' ').length / 2.5));
             durationEl.textContent = formatTime(estimatedDuration);
             currentTimeVal = 0;
@@ -2640,6 +2641,9 @@
             progressFill.style.width = '0%';
 
             playAudio(narrative);
+
+            // Populate choices after a delay so it feels like they're being generated
+            setTimeout(() => { enableChoices(); }, 2000);
         }
 
         function renderStoryLines(initial = false) {
@@ -2710,10 +2714,26 @@
 
         // ============ CHOICES ============
         function enableChoices() {
-            choiceIcons.querySelectorAll('.choice-btn').forEach((b, i) => b.disabled = i >= currentChoices.length);
+            const btns = choiceIcons.querySelectorAll('.choice-btn');
+            btns.forEach((b, i) => {
+                b.disabled = i >= currentChoices.length;
+                if (!b.disabled) {
+                    b.style.opacity = '0';
+                    b.style.transform = 'scale(0.5)';
+                    setTimeout(() => {
+                        b.style.transition = 'opacity 0.4s ease-out, transform 0.4s ease-out';
+                        b.style.opacity = '1';
+                        b.style.transform = 'scale(1)';
+                    }, i * 150);
+                }
+            });
         }
         function disableChoices() {
-            choiceIcons.querySelectorAll('.choice-btn').forEach(b => b.disabled = true);
+            choiceIcons.querySelectorAll('.choice-btn').forEach(b => {
+                b.disabled = true;
+                b.style.opacity = '0.25';
+                b.style.transform = 'scale(1)';
+            });
         }
 
         choiceIcons.addEventListener('click', e => {
