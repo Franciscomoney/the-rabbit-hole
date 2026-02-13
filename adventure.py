@@ -14,6 +14,7 @@ logger = logging.getLogger(__name__)
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 NEMOTRON_MODEL = "nvidia/nemotron-3-nano-30b-a3b"
+NEMOTRON_ADVANCED = "nvidia/llama-3.3-nemotron-super-49b-v1.5"
 
 SYSTEM_PROMPT = """You are the Narrator of a choose-your-own-adventure book. You MUST use the book content provided to create the story.
 
@@ -120,6 +121,79 @@ async def find_three_paths(book_id: str, choices: List[str], current_chunk: int,
 
     logger.info(f"=== BRANCHING PATHS === Current: {current_chunk}, Paths: {paths}")
     return paths
+
+
+async def enhance_choices(response_text: str) -> str:
+    """Use Nemotron Super 49B to rewrite the 3 choices into vivid, compelling options."""
+    import re
+    # Extract the choices from the response
+    choice_pattern = re.compile(r'(\d)[.)]\s*(.+?)(?=\n\d[.)]|\n*$)', re.DOTALL)
+    matches = list(choice_pattern.finditer(response_text))
+
+    if len(matches) < 2:
+        return response_text  # No choices to enhance
+
+    # Get the narrative part (before choices)
+    first_choice_start = matches[0].start()
+    narrative = response_text[:first_choice_start].strip()
+    original_choices = [m.group(2).strip() for m in matches[:3]]
+
+    logger.info(f"=== ENHANCING CHOICES with {NEMOTRON_ADVANCED} ===")
+    logger.info(f"Original choices: {original_choices}")
+
+    prompt = f"""Rewrite these 3 choose-your-own-adventure choices. Rules:
+- Start each with "You" + an action verb (e.g. "You charge into...", "You whisper to...", "You slip away through...")
+- ONE sentence each, max 15 words
+- Make them vivid, dramatic, and specific — like real book choices
+- No markdown, no bold, no asterisks
+
+Original choices:
+1. {original_choices[0]}
+2. {original_choices[1] if len(original_choices) > 1 else 'Explore the area'}
+3. {original_choices[2] if len(original_choices) > 2 else 'Turn back'}
+
+Respond with ONLY the 3 rewritten choices:
+1.
+2.
+3. """
+
+    try:
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            resp = await client.post(
+                OPENROUTER_URL,
+                headers={
+                    "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+                    "Content-Type": "application/json"
+                },
+                json={
+                    "model": NEMOTRON_ADVANCED,
+                    "messages": [
+                        {"role": "user", "content": prompt}
+                    ],
+                    "temperature": 0.7,
+                    "max_tokens": 80
+                }
+            )
+            resp.raise_for_status()
+            data = resp.json()
+            enhanced = data["choices"][0]["message"]["content"].strip()
+            logger.info(f"=== ENHANCED CHOICES === {enhanced}")
+
+            # Parse enhanced choices
+            enhanced_matches = list(choice_pattern.finditer(enhanced))
+            if len(enhanced_matches) >= 2:
+                enhanced_choices = [m.group(2).strip() for m in enhanced_matches[:3]]
+                # Rebuild the response with enhanced choices
+                result = narrative + "\n\n"
+                for i, choice in enumerate(enhanced_choices):
+                    result += f"{i + 1}. {choice}\n"
+                return result.strip()
+            else:
+                logger.warning("Could not parse enhanced choices, keeping originals")
+                return response_text
+    except Exception as e:
+        logger.warning(f"Choice enhancement failed ({e}), keeping originals")
+        return response_text
 
 
 async def generate_adventure_response(
@@ -244,6 +318,9 @@ Three paths diverge before you. Each leads deeper into the story, but through en
 1. Push forward boldly into the heart of the action
 2. Investigate the mysteries lurking in the shadows
 3. Take the unexpected path — retreat and find another way"""
+
+    # Enhance choices with the advanced model
+    assistant_response = await enhance_choices(assistant_response)
 
     return {
         "response": assistant_response,

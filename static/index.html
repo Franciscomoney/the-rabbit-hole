@@ -59,21 +59,73 @@
             }
         }
 
-        .screen { display: none; flex-direction: column; flex: 1; overflow: hidden; }
-        .screen.active { display: flex; }
+        .screen { display: none; flex-direction: column; flex: 1; overflow: hidden; position: absolute; inset: 0; }
+        .screen.active { display: flex; z-index: 1; }
+
+        /* Page turn animation */
+        .app { perspective: 1400px; }
+
+        .screen.page-turn-out {
+            display: flex;
+            z-index: 2;
+            animation: pageTurnOut 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            transform-origin: left center;
+        }
+        .screen.page-turn-in {
+            display: flex;
+            z-index: 3;
+            animation: pageTurnIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            transform-origin: right center;
+        }
+        .screen.page-turn-back-out {
+            display: flex;
+            z-index: 2;
+            animation: pageTurnBackOut 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            transform-origin: right center;
+        }
+        .screen.page-turn-back-in {
+            display: flex;
+            z-index: 1;
+            animation: pageTurnBackIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            transform-origin: left center;
+        }
+
+        @keyframes pageTurnOut {
+            0% { transform: rotateY(0deg); opacity: 1; }
+            100% { transform: rotateY(-30deg) scale(0.95); opacity: 0.3; }
+        }
+        @keyframes pageTurnIn {
+            0% { transform: rotateY(90deg); opacity: 0; }
+            40% { opacity: 1; }
+            100% { transform: rotateY(0deg); opacity: 1; }
+        }
+        @keyframes pageTurnBackOut {
+            0% { transform: rotateY(0deg); opacity: 1; }
+            100% { transform: rotateY(90deg); opacity: 0; }
+        }
+        @keyframes pageTurnBackIn {
+            0% { transform: rotateY(-30deg) scale(0.95); opacity: 0.3; }
+            100% { transform: rotateY(0deg) scale(1); opacity: 1; }
+        }
 
         /* ========== HOME / LIBRARY SCREEN ========== */
         .home {
             flex: 1;
             display: flex;
             flex-direction: column;
+            overflow: hidden;
         }
 
         .home-header {
+            flex-shrink: 0;
             padding: 24px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            z-index: 10;
+            position: relative;
+            background: rgba(5, 10, 7, 0.85);
+            backdrop-filter: blur(10px);
         }
 
         .brand-logo {
@@ -88,13 +140,19 @@
         }
 
         .brand-tagline {
+            flex-shrink: 0;
             font-size: 0.85rem;
             color: var(--text-muted);
             letter-spacing: 2px;
             text-transform: uppercase;
             padding: 0 20px;
             margin-top: 4px;
-            margin-bottom: 8px;
+            margin-bottom: 0;
+            z-index: 10;
+            position: relative;
+            background: rgba(5, 10, 7, 0.85);
+            backdrop-filter: blur(10px);
+            padding-bottom: 8px;
         }
 
         .nvidia-badge {
@@ -148,9 +206,15 @@
         .home-scroll {
             flex: 1;
             overflow-y: auto;
-            padding-bottom: 100px;
             -webkit-overflow-scrolling: touch;
+            scroll-behavior: smooth;
+            scroll-snap-type: y proximity;
+            padding-top: 10px;
+            padding-bottom: 120px;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
         }
+        .home-scroll::-webkit-scrollbar { display: none; }
 
         /* Section headers */
         .section-head {
@@ -158,6 +222,8 @@
             justify-content: space-between;
             align-items: center;
             padding: 16px 20px 10px;
+            scroll-snap-align: start;
+            scroll-margin-top: 10px;
         }
         .section-label {
             font-family: 'Merriweather', serif;
@@ -242,7 +308,10 @@
             border-radius: 16px;
             padding: 12px;
             border: 1px solid transparent;
-            transition: all 0.2s;
+            transition: opacity 0.15s ease-out, transform 0.15s ease-out, filter 0.15s ease-out;
+            transform-origin: center center;
+            scroll-snap-align: start;
+            scroll-margin-top: 10px;
         }
         .book-cell:active {
             border-color: var(--glass-border);
@@ -326,6 +395,10 @@
             padding: 12px 0;
             border-bottom: 1px solid var(--glass-border);
             cursor: pointer;
+            transition: opacity 0.15s ease-out, transform 0.15s ease-out, filter 0.15s ease-out;
+            transform-origin: center center;
+            scroll-snap-align: start;
+            scroll-margin-top: 10px;
         }
         .book-row:last-child { border: none; }
 
@@ -943,10 +1016,13 @@
         .detail-bottom-actions {
             display: flex;
             justify-content: center;
-            gap: 12px;
             padding: 10px 20px 8px;
             position: relative;
             z-index: 2;
+        }
+
+        .detail-edit-wrap {
+            position: relative;
         }
 
         .detail-bottom-btn {
@@ -966,7 +1042,53 @@
             transition: all 0.2s;
         }
         .detail-bottom-btn:active { transform: scale(0.95); }
-        .detail-bottom-btn.danger { color: #ff6b6b; border-color: rgba(255, 107, 107, 0.15); }
+
+        .edit-dropdown {
+            display: none;
+            position: absolute;
+            bottom: calc(100% + 8px);
+            left: 50%;
+            transform: translateX(-50%);
+            min-width: 200px;
+            background: rgba(20, 30, 22, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+            animation: dropUp 0.2s ease-out;
+        }
+        .edit-dropdown.active { display: block; }
+
+        @keyframes dropUp {
+            from { opacity: 0; transform: translateX(-50%) translateY(8px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+
+        .edit-dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 18px;
+            cursor: pointer;
+            color: var(--text-main);
+            font-size: 0.85rem;
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            transition: background 0.15s;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+        }
+        .edit-dropdown-item:hover, .edit-dropdown-item:active {
+            background: rgba(255,255,255,0.08);
+        }
+        .edit-dropdown-item + .edit-dropdown-item {
+            border-top: 1px solid rgba(255,255,255,0.06);
+        }
+        .edit-dropdown-item.danger { color: #ff6b6b; }
+        .edit-dropdown-item svg { flex-shrink: 0; }
 
         /* ========== READER SCREEN ========== */
         #readerScreen {
@@ -1060,6 +1182,7 @@
         .story-text {
             position: absolute;
             width: 100%;
+            padding-top: 40px;
             transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
             will-change: transform;
         }
@@ -1686,14 +1809,22 @@
                 </div>
 
                 <div class="detail-bottom-actions">
-                    <button class="detail-bottom-btn" id="detailEditBtn">
-                        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
-                        Edit
-                    </button>
-                    <button class="detail-bottom-btn danger" id="detailDeleteBtn">
-                        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                        Delete
-                    </button>
+                    <div class="detail-edit-wrap">
+                        <button class="detail-bottom-btn" id="detailEditToggle">
+                            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                            Edit
+                        </button>
+                        <div class="edit-dropdown" id="editDropdown">
+                            <button class="edit-dropdown-item" id="detailEditBtn">
+                                <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                                Change information
+                            </button>
+                            <button class="edit-dropdown-item danger" id="detailDeleteBtn">
+                                <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                Delete
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -2181,6 +2312,43 @@
             searchInput.focus();
         });
 
+        // ============ HOME SCROLL FADE (like reader) ============
+        const homeScrollEl = document.querySelector('.home-scroll');
+        if (homeScrollEl) {
+            homeScrollEl.addEventListener('scroll', () => {
+                const items = homeScrollEl.querySelectorAll('.book-cell, .book-row');
+                const containerTop = homeScrollEl.getBoundingClientRect().top;
+                const containerBottom = homeScrollEl.getBoundingClientRect().bottom;
+                const fadeZone = 120;
+
+                items.forEach(item => {
+                    const rect = item.getBoundingClientRect();
+                    const itemCenter = rect.top + rect.height / 2;
+
+                    // Fade at top
+                    if (itemCenter < containerTop + fadeZone) {
+                        const ratio = Math.max(0, (itemCenter - containerTop) / fadeZone);
+                        item.style.opacity = ratio * 0.7 + 0.1;
+                        item.style.transform = `scale(${0.92 + ratio * 0.08})`;
+                        item.style.filter = `blur(${(1 - ratio) * 2}px)`;
+                    }
+                    // Fade at bottom
+                    else if (itemCenter > containerBottom - fadeZone) {
+                        const ratio = Math.max(0, (containerBottom - itemCenter) / fadeZone);
+                        item.style.opacity = ratio * 0.7 + 0.3;
+                        item.style.transform = `scale(${0.95 + ratio * 0.05})`;
+                        item.style.filter = `blur(${(1 - ratio) * 1}px)`;
+                    }
+                    // Fully visible
+                    else {
+                        item.style.opacity = '1';
+                        item.style.transform = 'scale(1)';
+                        item.style.filter = 'none';
+                    }
+                });
+            }, { passive: true });
+        }
+
         function esc(s) { return (s || '').replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
 
         // ============ BOOK DETAIL ============
@@ -2213,14 +2381,33 @@
                 ? tagList.map(t => `<span class="detail-tag">${t}</span>`).join('')
                 : '<span class="detail-tag">Interactive Fiction</span>';
 
-            homeScreen.classList.remove('active');
-            uploadScreen.classList.remove('active');
-            detailScreen.classList.add('active');
+            pageTurn(homeScreen, detailScreen);
             hideTabBar();
         }
 
+        function pageTurn(from, to) {
+            from.classList.add('page-turn-out');
+            to.classList.add('page-turn-in');
+            to.classList.add('active');
+            setTimeout(() => {
+                from.classList.remove('active', 'page-turn-out');
+                to.classList.remove('page-turn-in');
+            }, 600);
+        }
+
+        function pageTurnBack(from, to) {
+            from.classList.add('page-turn-back-out');
+            to.classList.add('page-turn-back-in', 'active');
+            setTimeout(() => {
+                from.classList.remove('active', 'page-turn-back-out');
+                to.classList.remove('page-turn-back-in');
+            }, 500);
+        }
+
         document.getElementById('detailBackBtn').addEventListener('click', () => {
-            switchTab('home');
+            pageTurnBack(detailScreen, homeScreen);
+            mainTabBar.style.display = 'flex';
+            document.getElementById('homeTabBtn').classList.add('active');
         });
 
         document.getElementById('detailShareBtn').addEventListener('click', async () => {
@@ -2250,7 +2437,19 @@
             } catch (e) { alert('Failed: ' + e.message); }
         });
 
+        // ============ EDIT DROPDOWN ============
+        const editDropdown = document.getElementById('editDropdown');
+        document.getElementById('detailEditToggle').addEventListener('click', () => {
+            editDropdown.classList.toggle('active');
+        });
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.detail-edit-wrap')) {
+                editDropdown.classList.remove('active');
+            }
+        });
+
         document.getElementById('detailEditBtn').addEventListener('click', () => {
+            editDropdown.classList.remove('active');
             openEditModal(currentBookId, bookTitle, bookAuthor);
         });
 
@@ -2260,6 +2459,7 @@
         const deleteConfirmBtn = document.getElementById('deleteConfirmBtn');
 
         document.getElementById('detailDeleteBtn').addEventListener('click', () => {
+            editDropdown.classList.remove('active');
             document.getElementById('deleteModalMsg').textContent = `This will permanently remove "${bookTitle}" and all its data. This action cannot be undone.`;
             deleteConfirmInput.value = '';
             deleteConfirmBtn.disabled = true;

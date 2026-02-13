@@ -34,11 +34,13 @@ Upload Book → Chunk & Embed → Play Adventure → Listen & Choose → Story B
 | Model | Role | API |
 |-------|------|-----|
 | **[nvidia/nemotron-3-nano-30b-a3b](https://build.nvidia.com/nvidia/nemotron-3-nano-30b-a3b)** | Story generation, interactive narrative, title/author extraction, book summaries, tag extraction | OpenRouter |
+| **[nvidia/llama-3.3-nemotron-super-49b-v1.5](https://openrouter.ai/nvidia/llama-3.3-nemotron-super-49b-v1.5)** | Choice enhancement — rewrites adventure options into vivid, actionable prompts | OpenRouter |
 | **[nvidia/nv-embedqa-e5-v5](https://build.nvidia.com/nvidia/nv-embedqa-e5-v5)** | Semantic text embeddings for RAG-based passage retrieval | NVIDIA NIM API |
 
 ### Why These Models?
 
-- **Nemotron 30B** is a reasoning-capable model that generates rich, contextual narratives grounded in the source material. It understands story structure, creates branching choices, and maintains coherence across turns — all while being efficient enough for real-time interactive use.
+- **Nemotron 30B** generates rich, contextual narratives at high speed. It handles story generation, title extraction, and summaries — efficient enough for real-time interactive use.
+- **Nemotron Super 49B** enhances the 3 adventure choices with vivid, actionable language ("You charge through the door..."). A quick second pass that makes choices feel like a real choose-your-own-adventure book.
 - **NV-EmbedQA-E5-v5** provides high-quality semantic embeddings that power the retrieval system. As the user progresses through the adventure, the system retrieves the most relevant book passages to feed into the narrative generation — ensuring the AI stays faithful to the original text.
 
 ---
@@ -93,6 +95,9 @@ Upload Book → Chunk & Embed → Play Adventure → Listen & Choose → Story B
 - **Interactive audio playback** — narrated with synchronized text highlighting (Apple Music lyrics style)
 - **Choose-your-own-adventure** — 3 choices at every turn, each routed to different book passages via semantic search
 - **Real branching** — choices use embedding similarity to find the most relevant passage, so every path is unique
+- **Dual-model choices** — Nemotron 30B generates the narrative fast, Nemotron Super 49B rewrites choices into vivid, actionable prompts
+- **Page-turn transitions** — 3D CSS perspective animations between screens, like turning a real book page
+- **App-shell layout** — fixed header with frosted glass, independent container scroll with CSS scroll snap
 - **Session persistence** — continue where you left off
 - **Voice input** — speak your choices (optional, requires Whisper STT endpoint)
 - **Search** — real-time search across titles, authors, and tags
