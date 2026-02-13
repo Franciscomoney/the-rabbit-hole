@@ -6,28 +6,28 @@
     <title>The Rabbit Hole | Interactive Audio Adventures</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,400&display=swap" rel="stylesheet">
     <style>
+        /* ========== VARIABLES ========== */
         :root {
-            --bg: #ffffff;
-            --bg-secondary: #f5f5f7;
-            --text: #1d1d1f;
-            --text-secondary: #6e6e73;
-            --text-tertiary: #aeaeb2;
-            --border: #e5e5ea;
-            --nvidia-green: #76B900;
-            --nvidia-dark: #1a2e00;
-            --nvidia-mid: #2a4a00;
-            --nvidia-deep: #3d6b00;
-            --accent: #76B900;
+            --primary: #a3ffac;
+            --bg-deep: #050a07;
+            --bg-card: #0f1c15;
+            --text-main: #ffffff;
+            --text-muted: #8b9bb4;
+            --glass-bg: rgba(15, 28, 21, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-light: rgba(255, 255, 255, 0.05);
+            --nvidia-green: #a3ffac;
+            --accent: #a3ffac;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #f2f2f7;
-            color: var(--text);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #020504;
+            color: var(--text-main);
             min-height: 100vh;
             min-height: 100dvh;
             display: flex;
@@ -40,7 +40,8 @@
             max-width: 430px;
             height: 100vh;
             height: 100dvh;
-            background: var(--bg);
+            background: var(--bg-deep);
+            background-image: radial-gradient(circle at 50% 0%, #1a3a2a 0%, #050a07 60%);
             display: flex;
             flex-direction: column;
             overflow: hidden;
@@ -53,8 +54,8 @@
                 height: 92vh;
                 max-height: 900px;
                 border-radius: 40px;
-                box-shadow: 0 25px 80px rgba(0,0,0,0.12);
-                border: 1px solid rgba(0,0,0,0.06);
+                box-shadow: 0 25px 80px rgba(0,0,0,0.6);
+                border: 1px solid var(--glass-border);
             }
         }
 
@@ -66,84 +67,86 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            background: var(--bg);
         }
 
-        .home-tagline {
-            padding: 18px 20px 2px;
-        }
-
-        .tagline-name {
-            font-family: 'Lora', serif;
-            font-weight: 700;
-            color: var(--nvidia-deep);
-            font-size: 1.5rem;
-            line-height: 1.2;
-        }
-
-        .tagline-text {
-            color: var(--text-secondary);
-            font-size: 0.78rem;
-            margin-top: 2px;
-            letter-spacing: 0.2px;
-        }
-
-        .home-actions {
+        .home-header {
+            padding: 24px 20px;
             display: flex;
-            gap: 6px;
+            justify-content: space-between;
             align-items: center;
         }
 
-        .icon-btn {
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
-            background: none;
-            border: none;
-            cursor: pointer;
+        .brand-logo {
+            font-family: 'Merriweather', serif;
+            font-weight: 900;
+            font-size: 1.8rem;
+            letter-spacing: -0.5px;
+            background: linear-gradient(to right, #fff, var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1;
+        }
+
+        .brand-tagline {
+            font-size: 0.55rem;
+            color: var(--text-muted);
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .nvidia-badge {
             display: flex;
             align-items: center;
-            justify-content: center;
-            color: var(--text);
-            transition: background 0.15s;
+            gap: 5px;
+            font-size: 0.62rem;
+            font-weight: 600;
+            color: var(--nvidia-green);
+            letter-spacing: 0.3px;
+            border: 1px solid rgba(163, 255, 172, 0.3);
+            padding: 4px 10px;
+            border-radius: 12px;
         }
-        .icon-btn:hover { background: var(--bg-secondary); }
+        .nvidia-badge svg { width: 14px; height: 14px; flex-shrink: 0; }
+        .nvidia-badge span { color: var(--text-muted); font-weight: 400; }
 
-        .icon-btn svg { width: 20px; height: 20px; }
-
-        /* Filter tabs */
+        /* Filter pills */
         .filter-tabs {
             display: flex;
-            gap: 8px;
-            padding: 14px 20px 8px;
+            gap: 10px;
+            padding: 0 20px;
+            margin-bottom: 16px;
             overflow-x: auto;
             scrollbar-width: none;
         }
         .filter-tabs::-webkit-scrollbar { display: none; }
 
         .filter-tab {
-            padding: 7px 16px;
-            border-radius: 18px;
-            border: none;
-            background: var(--bg-secondary);
-            font-size: 0.78rem;
+            padding: 8px 20px;
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            background: var(--glass-light);
+            font-size: 0.85rem;
             font-weight: 500;
             cursor: pointer;
             white-space: nowrap;
-            color: var(--text-secondary);
+            color: var(--text-muted);
             font-family: inherit;
-            transition: all 0.15s;
+            transition: all 0.2s;
         }
         .filter-tab.active {
-            background: var(--text);
-            color: white;
+            background: var(--primary);
+            color: var(--bg-deep);
+            font-weight: 600;
+            border-color: var(--primary);
+            box-shadow: 0 0 15px rgba(163, 255, 172, 0.2);
         }
 
-        /* Scrollable content area */
+        /* Scrollable area */
         .home-scroll {
             flex: 1;
             overflow-y: auto;
-            padding-bottom: 80px;
+            padding-bottom: 100px;
             -webkit-overflow-scrolling: touch;
         }
 
@@ -152,48 +155,58 @@
             display: flex;
             justify-content: space-between;
             align-items: baseline;
-            padding: 20px 20px 10px;
+            padding: 20px 20px 14px;
         }
         .section-label {
-            font-size: 0.95rem;
+            font-family: 'Merriweather', serif;
+            font-size: 1.1rem;
             font-weight: 700;
-            color: var(--text);
+            color: var(--text-main);
         }
         .section-count {
             font-size: 0.78rem;
-            color: var(--text-tertiary);
+            color: var(--text-muted);
             font-weight: 400;
-            margin-left: 6px;
+            margin-left: 8px;
         }
         .section-link {
-            font-size: 0.78rem;
-            color: var(--accent);
+            font-size: 0.8rem;
+            color: var(--primary);
             text-decoration: none;
             font-weight: 500;
+            cursor: pointer;
         }
 
-        /* Book grid - matching reference 3 columns */
+        /* Book grid - 2 columns */
         .book-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
             padding: 0 20px;
         }
 
         .book-cell {
             cursor: pointer;
-            transition: transform 0.15s;
+            background: var(--glass-light);
+            border-radius: 16px;
+            padding: 12px;
+            border: 1px solid transparent;
+            transition: all 0.2s;
         }
-        .book-cell:active { transform: scale(0.96); }
+        .book-cell:active {
+            border-color: var(--glass-border);
+            background: rgba(255,255,255,0.08);
+            transform: scale(0.97);
+        }
 
         .book-cover {
             width: 100%;
-            aspect-ratio: 2.8 / 4;
-            border-radius: 8px;
+            aspect-ratio: 2 / 3;
+            border-radius: 10px;
             position: relative;
             overflow: hidden;
-            margin-bottom: 6px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 10px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.4);
         }
 
         .book-cover-inner {
@@ -203,7 +216,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 12px 8px;
+            padding: 14px 10px;
             text-align: center;
         }
 
@@ -217,8 +230,8 @@
         }
 
         .book-cover-title {
-            font-family: 'Lora', serif;
-            font-size: 0.72rem;
+            font-family: 'Merriweather', serif;
+            font-size: 0.78rem;
             font-weight: 700;
             color: white;
             line-height: 1.3;
@@ -227,9 +240,9 @@
         }
 
         .book-cover-author {
-            font-size: 0.55rem;
+            font-size: 0.58rem;
             font-weight: 500;
-            color: rgba(255,255,255,0.8);
+            color: rgba(255,255,255,0.7);
             margin-top: 4px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -237,9 +250,9 @@
 
         .book-name {
             font-weight: 600;
-            font-size: 0.75rem;
-            color: var(--text);
-            line-height: 1.25;
+            font-size: 0.88rem;
+            color: var(--text-main);
+            line-height: 1.3;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
@@ -247,9 +260,9 @@
         }
 
         .book-author {
-            font-size: 0.68rem;
-            color: var(--text-tertiary);
-            margin-top: 2px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 3px;
         }
 
         /* Book list rows */
@@ -258,20 +271,20 @@
         .book-row {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 10px 0;
-            border-bottom: 1px solid var(--bg-secondary);
+            gap: 14px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--glass-border);
             cursor: pointer;
         }
         .book-row:last-child { border: none; }
 
         .book-row-cover {
-            width: 48px;
-            height: 64px;
-            border-radius: 6px;
+            width: 50px;
+            height: 68px;
+            border-radius: 8px;
             flex-shrink: 0;
             overflow: hidden;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
         }
 
         .book-row-cover-inner {
@@ -285,7 +298,7 @@
         }
 
         .book-row-cover-inner span {
-            font-family: 'Lora', serif;
+            font-family: 'Merriweather', serif;
             font-size: 0.5rem;
             font-weight: 700;
             color: white;
@@ -298,102 +311,212 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            border-radius: 6px;
+            border-radius: 8px;
         }
 
         .book-row-info { flex: 1; min-width: 0; }
 
         .book-row-title {
             font-weight: 600;
-            font-size: 0.85rem;
-            margin-bottom: 2px;
+            font-size: 0.9rem;
+            margin-bottom: 3px;
+            color: var(--text-main);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
         .book-row-meta {
-            font-size: 0.72rem;
-            color: var(--text-secondary);
+            font-size: 0.75rem;
+            color: var(--text-muted);
         }
 
         .book-row-stats {
             display: flex;
             gap: 10px;
             margin-top: 3px;
-            font-size: 0.68rem;
-            color: var(--text-tertiary);
+            font-size: 0.7rem;
+            color: var(--text-muted);
         }
-
-        .book-row-actions {
-            display: flex;
-            gap: 2px;
-        }
-
-        .row-action {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 0.75rem;
-            color: var(--text-tertiary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .row-action:hover { background: var(--bg-secondary); }
-        .row-action.del:hover { color: #ff3b30; }
 
         /* Empty state */
         .empty {
             text-align: center;
             padding: 60px 30px;
         }
-        .empty-icon { font-size: 3rem; margin-bottom: 14px; opacity: 0.5; }
+        .empty-icon { font-size: 3rem; margin-bottom: 14px; opacity: 0.4; }
         .empty-text {
             font-size: 0.9rem;
-            color: var(--text-secondary);
+            color: var(--text-muted);
             line-height: 1.5;
         }
 
-        /* Upload FAB - dark pill */
-        .fab {
-            position: absolute;
-            bottom: 70px;
-            left: 50%;
-            transform: translateX(-50%);
-            height: 48px;
-            padding: 0 28px;
+        /* ========== UPLOAD SCREEN ========== */
+        .upload-screen-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+            position: relative;
+            overflow-y: auto;
+            padding-bottom: 100px;
+        }
+
+        .upload-header {
+            padding: 24px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Drop zone visual */
+        .upload-drop-zone {
+            margin: 0 20px 24px;
+            height: 220px;
+            border: 2px dashed rgba(163, 255, 172, 0.3);
             border-radius: 24px;
-            background: var(--text);
-            border: none;
-            color: white;
+            background: rgba(15, 28, 21, 0.4);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .upload-drop-zone:hover, .upload-drop-zone.drag-over {
+            border-color: var(--primary);
+            background: rgba(163, 255, 172, 0.05);
+            box-shadow: 0 0 30px rgba(163, 255, 172, 0.1);
+        }
+        .upload-drop-zone.has-file {
+            border-color: var(--primary);
+            border-style: solid;
+            background: rgba(163, 255, 172, 0.08);
+        }
+        .upload-drop-zone.has-file .upload-drop-icon { background: rgba(163, 255, 172, 0.15); border-color: rgba(163, 255, 172, 0.3); }
+        .upload-drop-zone.has-file .upload-drop-icon svg { color: var(--primary); }
+
+        .upload-drop-icon {
+            width: 70px;
+            height: 70px;
+            background: var(--bg-card);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .upload-drop-icon svg {
+            color: var(--primary);
+            width: 28px;
+            height: 28px;
+        }
+
+        .upload-drop-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .upload-drop-desc {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            max-width: 200px;
+            line-height: 1.5;
+        }
+
+        /* Steps section */
+        .upload-steps {
+            padding: 0 24px;
+            margin-bottom: 30px;
+        }
+
+        .upload-steps-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+
+        .upload-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+
+        .upload-step-num {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            background: rgba(163, 255, 172, 0.12);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.8rem;
+            color: var(--primary);
+            flex-shrink: 0;
+        }
+
+        .upload-step-text { flex: 1; padding-top: 4px; }
+        .upload-step-text strong {
+            display: block;
             font-size: 0.88rem;
             font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 2px;
+        }
+        .upload-step-text span {
+            font-size: 0.76rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        /* Upload main button */
+        .upload-main-btn {
+            width: calc(100% - 48px);
+            margin: 0 auto;
+            padding: 18px;
+            border: none;
+            border-radius: 16px;
+            background: var(--primary);
+            color: var(--bg-deep);
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-            transition: all 0.2s;
-            font-family: inherit;
-            white-space: nowrap;
-            z-index: 10;
+            gap: 10px;
+            box-shadow: 0 0 30px rgba(163, 255, 172, 0.3);
+            transition: transform 0.15s;
         }
-        .fab:hover { transform: translateX(-50%) translateY(-1px); box-shadow: 0 6px 28px rgba(0,0,0,0.25); }
-        .fab:active { transform: translateX(-50%) translateY(0); }
+        .upload-main-btn:active { transform: scale(0.97); }
+        .upload-main-btn:disabled { opacity: 0.3; cursor: not-allowed; box-shadow: none; }
+        .upload-main-btn:disabled:active { transform: none; }
+        .upload-main-btn svg { width: 20px; height: 20px; }
 
-        .fab svg { width: 18px; height: 18px; }
+        .upload-formats {
+            margin-top: 10px;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-align: center;
+        }
 
         /* Upload overlay */
         .upload-overlay {
             display: none;
             position: absolute;
             inset: 0;
-            background: rgba(255,255,255,0.97);
+            background: rgba(5, 10, 7, 0.97);
             backdrop-filter: blur(20px);
             z-index: 100;
             flex-direction: column;
@@ -414,234 +537,110 @@
             font-weight: 500;
             text-align: center;
             padding: 0 40px;
-            color: var(--text);
+            color: var(--text-main);
         }
 
         .upload-bar {
-            width: 160px;
-            height: 3px;
-            background: var(--border);
+            width: 180px;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
             border-radius: 2px;
             overflow: hidden;
         }
 
         .upload-bar-fill {
             height: 100%;
-            background: var(--accent);
+            background: var(--primary);
+            box-shadow: 0 0 10px var(--primary);
             width: 0%;
             transition: width 0.3s;
         }
 
         .file-input { display: none; }
 
-        /* Upload screen */
-        .upload-screen-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 0 0 30px;
-            text-align: center;
-            position: relative;
-            overflow-y: auto;
-        }
-
-        .upload-screen-content .home-tagline {
-            width: 100%;
-            text-align: left;
-        }
-
-        .upload-screen-content .nvidia-badge {
-            align-self: flex-start;
-        }
-
-        .upload-screen-title {
-            margin-top: 32px;
-            font-family: 'Lora', serif;
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: var(--text);
-            margin-bottom: 6px;
-        }
-
-        .upload-screen-subtitle {
-            font-size: 0.82rem;
-            color: var(--text-secondary);
-            margin-bottom: 36px;
-        }
-
-        .upload-steps {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            margin-bottom: 40px;
-            padding: 0 10px;
-        }
-
-        .upload-step {
-            display: flex;
-            align-items: flex-start;
-            gap: 14px;
-            text-align: left;
-        }
-
-        .upload-step-num {
-            width: 32px;
-            height: 32px;
-            border-radius: 10px;
-            background: var(--bg-secondary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 0.8rem;
-            color: var(--nvidia-deep);
-            flex-shrink: 0;
-        }
-
-        .upload-step-text {
-            flex: 1;
-            padding-top: 4px;
-        }
-
-        .upload-step-text strong {
-            display: block;
-            font-size: 0.88rem;
-            font-weight: 600;
-            color: var(--text);
-            margin-bottom: 2px;
-        }
-
-        .upload-step-text span {
-            font-size: 0.76rem;
-            color: var(--text-secondary);
-            line-height: 1.4;
-        }
-
-        .upload-main-btn {
-            width: calc(100% - 20px);
-            padding: 16px;
-            border: none;
-            border-radius: 14px;
-            background: linear-gradient(145deg, var(--nvidia-deep), #76B900);
-            color: white;
-            font-family: 'DM Sans', sans-serif;
-            font-size: 0.95rem;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            box-shadow: 0 4px 16px rgba(60, 100, 0, 0.3);
-            transition: transform 0.15s, box-shadow 0.15s;
-        }
-
-        .upload-main-btn:active {
-            transform: scale(0.97);
-            box-shadow: 0 2px 8px rgba(60, 100, 0, 0.2);
-        }
-
-        .upload-main-btn svg {
-            width: 20px;
-            height: 20px;
-        }
-
-        .upload-formats {
-            margin-top: 12px;
-            font-size: 0.7rem;
-            color: var(--text-tertiary);
-        }
-
-        /* Bottom tab bar */
-        .tab-bar {
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            padding: 8px 0 12px;
-            border-top: 1px solid var(--border);
-            background: var(--bg);
-            position: relative;
-            z-index: 5;
-        }
-
-        .tab-bar-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 2px;
-            cursor: pointer;
-            padding: 4px 16px;
-            background: none;
-            border: none;
-            font-family: inherit;
-        }
-
-        .tab-bar-item svg { width: 22px; height: 22px; color: var(--text-tertiary); }
-        .tab-bar-item span { font-size: 0.6rem; color: var(--text-tertiary); font-weight: 500; }
-        .tab-bar-item.active svg { color: var(--accent); }
-        .tab-bar-item.active span { color: var(--accent); }
-
-        /* NVIDIA badge */
-        .nvidia-badge {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            padding: 10px 20px 4px;
-            font-size: 0.65rem;
-            font-weight: 600;
-            color: var(--nvidia-green);
-            letter-spacing: 0.3px;
-        }
-
-        .nvidia-badge svg { width: 14px; height: 14px; flex-shrink: 0; }
-        .nvidia-badge span { color: var(--text-tertiary); font-weight: 400; }
-
         /* ========== BOOK DETAIL SCREEN ========== */
-        .detail { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--bg); }
+        .detail {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .detail-ambient {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            background: radial-gradient(circle at 50% 20%, #1a3a2a 0%, var(--bg-deep) 70%);
+        }
 
         .detail-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 14px 20px;
+            position: relative;
+            z-index: 2;
         }
 
         .detail-back {
-            width: 34px;
-            height: 34px;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
-            border: none;
-            background: none;
+            border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
             cursor: pointer;
-            font-size: 1.1rem;
-            color: var(--text);
+            color: white;
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: all 0.2s;
         }
+        .detail-back:active { transform: scale(0.9); background: rgba(255,255,255,0.2); }
 
-        .detail-actions { display: flex; gap: 6px; }
+        .detail-actions { display: flex; gap: 8px; }
+
+        .detail-btn-small {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .detail-btn-small:active { transform: scale(0.9); }
 
         .detail-scroll {
             flex: 1;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
+            position: relative;
+            z-index: 1;
         }
 
         .detail-cover-area {
             display: flex;
             justify-content: center;
-            padding: 10px 20px 20px;
+            padding: 10px 20px 28px;
         }
 
         .detail-cover {
-            width: 160px;
-            aspect-ratio: 2.8 / 4;
+            width: 200px;
+            aspect-ratio: 2 / 3;
             border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+            position: relative;
         }
 
         .detail-cover-inner {
@@ -651,7 +650,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 16px;
+            padding: 20px;
             text-align: center;
             position: relative;
         }
@@ -664,8 +663,8 @@
         }
 
         .detail-cover-title {
-            font-family: 'Lora', serif;
-            font-size: 1.1rem;
+            font-family: 'Merriweather', serif;
+            font-size: 1.2rem;
             font-weight: 700;
             color: white;
             line-height: 1.25;
@@ -673,97 +672,116 @@
         }
 
         .detail-cover-author {
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             font-weight: 500;
-            color: rgba(255,255,255,0.85);
+            color: rgba(255,255,255,0.8);
             margin-top: 8px;
             text-transform: uppercase;
             letter-spacing: 0.8px;
         }
 
         .detail-title {
-            font-size: 1.2rem;
+            font-family: 'Merriweather', serif;
+            font-size: 1.5rem;
             font-weight: 700;
             text-align: center;
             padding: 0 20px;
-            color: var(--text);
+            color: var(--text-main);
+            text-shadow: 0 4px 10px rgba(0,0,0,0.5);
         }
 
         .detail-author-name {
-            font-size: 0.82rem;
-            color: var(--text-secondary);
+            font-size: 0.9rem;
+            color: var(--primary);
             text-align: center;
-            margin-top: 4px;
+            margin-top: 6px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 600;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 4px;
+            opacity: 0.9;
         }
-
-        .detail-author-name svg { width: 14px; height: 14px; color: var(--accent); }
+        .detail-author-name svg { display: none; }
 
         .detail-buttons {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 14px;
-            padding: 18px 20px;
+            padding: 24px 20px;
         }
 
         .detail-play-btn {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            background: var(--accent);
+            width: 100%;
+            max-width: 340px;
+            height: 56px;
+            border-radius: 16px;
+            background: var(--primary);
             border: none;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            box-shadow: 0 4px 16px rgba(88,86,214,0.35);
-            transition: transform 0.15s;
+            gap: 12px;
+            color: var(--bg-deep);
+            font-weight: 700;
+            font-size: 1.05rem;
+            font-family: 'Inter', sans-serif;
+            box-shadow: 0 0 30px rgba(163, 255, 172, 0.25);
+            transition: transform 0.2s;
         }
-        .detail-play-btn:hover { transform: scale(1.05); }
-        .detail-play-btn svg { width: 22px; height: 22px; }
+        .detail-play-btn:active { transform: scale(0.98); }
+        .detail-play-btn svg { width: 24px; height: 24px; }
 
-        .detail-overview {
-            padding: 0 20px 16px;
+        /* Glass info sheet */
+        .detail-info-sheet {
+            background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.5));
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--glass-border);
+            border-top-left-radius: 32px;
+            border-top-right-radius: 32px;
+            padding: 28px 24px 40px;
+            margin-top: 10px;
         }
+
+        .detail-overview { margin-bottom: 16px; }
 
         .detail-overview-title {
-            font-size: 0.85rem;
+            font-family: 'Merriweather', serif;
+            font-size: 1rem;
             font-weight: 700;
-            margin-bottom: 8px;
-            color: var(--text);
+            margin-bottom: 10px;
+            color: var(--text-main);
         }
 
         .detail-overview-text {
-            font-size: 0.82rem;
-            color: var(--text-secondary);
-            line-height: 1.55;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.6;
         }
 
         .detail-tags {
             display: flex;
             flex-wrap: wrap;
-            gap: 6px;
-            padding: 4px 20px 20px;
+            gap: 8px;
+            padding-top: 8px;
         }
 
         .detail-tag {
-            padding: 5px 12px;
-            border-radius: 14px;
-            border: 1px solid var(--border);
-            font-size: 0.7rem;
-            color: var(--text-secondary);
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.05);
+            font-size: 0.8rem;
+            color: var(--text-muted);
             font-weight: 500;
-            background: none;
+            background: rgba(255,255,255,0.1);
         }
 
         /* ========== READER SCREEN ========== */
         #readerScreen {
-            background: linear-gradient(170deg, var(--nvidia-deep) 0%, var(--nvidia-mid) 40%, var(--nvidia-dark) 100%);
+            background: radial-gradient(circle at top right, #1a3a2a, #050a07);
         }
 
         .reader-header {
@@ -793,7 +811,7 @@
             position: absolute;
             left: 50%;
             transform: translateX(-50%);
-            font-family: 'Lora', serif;
+            font-family: 'Merriweather', serif;
             font-weight: 700;
             font-size: 1.1rem;
             color: white;
@@ -814,7 +832,6 @@
             z-index: 1;
         }
         .reader-header-btn:active { background: rgba(255,255,255,0.1); }
-
         .reader-header-btn svg { width: 18px; height: 18px; }
 
         /* NVIDIA model bar */
@@ -827,12 +844,11 @@
             font-size: 0.6rem;
             color: rgba(255,255,255,0.3);
         }
-
         .model-tag { display: flex; align-items: center; gap: 4px; }
-        .model-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--nvidia-green); }
-        .model-label { color: var(--nvidia-green); font-weight: 600; }
+        .model-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--primary); }
+        .model-label { color: var(--primary); font-weight: 600; }
 
-        /* Story area - centered quote style like reference */
+        /* Story area */
         .story-area {
             flex: 1;
             display: flex;
@@ -848,27 +864,8 @@
             height: 100%;
             overflow: hidden;
             position: relative;
-        }
-
-        .story-text-wrapper::before,
-        .story-text-wrapper::after {
-            content: '';
-            position: absolute;
-            left: 0;
-            right: 0;
-            height: 80px;
-            pointer-events: none;
-            z-index: 10;
-        }
-
-        .story-text-wrapper::before {
-            top: 0;
-            background: linear-gradient(to bottom, var(--nvidia-deep) 0%, transparent 100%);
-        }
-
-        .story-text-wrapper::after {
-            bottom: 0;
-            background: linear-gradient(to top, var(--nvidia-mid) 0%, transparent 100%);
+            mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 88%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 88%, transparent 100%);
         }
 
         .story-text {
@@ -881,84 +878,87 @@
         .story-text .line {
             display: block;
             padding: 12px 0;
-            font-family: 'Lora', serif;
-            font-size: 1.3rem;
+            font-family: 'Merriweather', serif;
+            font-size: 1.15rem;
             font-weight: 400;
-            line-height: 1.6;
+            line-height: 1.8;
             text-align: left;
             transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
             transform-origin: left center;
         }
 
         .story-text .line.passed {
-            opacity: 0.12;
+            opacity: 0.1;
             transform: scale(0.93);
             filter: blur(2px);
-            color: rgba(255,255,255,0.35);
+            color: rgba(255,255,255,0.3);
         }
 
         .story-text .line.current {
             opacity: 1;
             transform: scale(1);
             filter: blur(0);
-            color: white;
+            color: rgba(255,255,255,0.85);
         }
 
-        .story-text .line.upcoming { color: rgba(255,255,255,0.45); }
-        .story-text .line.upcoming-1 { opacity: 0.5; transform: scale(0.97); filter: blur(0.3px); }
-        .story-text .line.upcoming-2 { opacity: 0.3; transform: scale(0.95); filter: blur(0.8px); }
-        .story-text .line.upcoming-3 { opacity: 0.18; transform: scale(0.93); filter: blur(1.2px); }
-        .story-text .line.upcoming-far { opacity: 0.08; transform: scale(0.91); filter: blur(1.8px); }
+        .story-text .line.upcoming { color: rgba(255,255,255,0.4); }
+        .story-text .line.upcoming-1 { opacity: 0.45; transform: scale(0.97); filter: blur(0.3px); }
+        .story-text .line.upcoming-2 { opacity: 0.25; transform: scale(0.95); filter: blur(0.8px); }
+        .story-text .line.upcoming-3 { opacity: 0.15; transform: scale(0.93); filter: blur(1.2px); }
+        .story-text .line.upcoming-far { opacity: 0.06; transform: scale(0.91); filter: blur(1.8px); }
 
-        /* Choice buttons - right side floating */
+        /* Choice buttons - horizontal row inside player */
         .choices {
-            position: absolute;
-            right: 8px;
-            top: 50%;
-            transform: translateY(-50%);
             display: flex;
-            flex-direction: column;
-            gap: 8px;
-            z-index: 50;
+            justify-content: center;
+            gap: 14px;
+            padding: 8px 0 4px;
         }
 
         .choice-btn {
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
-            background: rgba(255,255,255,0.08);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--glass-border);
             color: white;
-            font-size: 0.85rem;
+            font-size: 1rem;
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.15s;
+            transition: all 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-family: inherit;
+            font-family: 'Inter', sans-serif;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
-        .choice-btn:hover {
-            background: var(--nvidia-green);
-            border-color: var(--nvidia-green);
-            transform: scale(1.08);
+        .choice-btn:hover, .choice-btn:active {
+            background: var(--primary);
+            color: var(--bg-deep);
+            border-color: var(--primary);
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(163, 255, 172, 0.4);
         }
-        .choice-btn:disabled { opacity: 0.15; cursor: not-allowed; }
-        .choice-btn:disabled:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.12); transform: none; }
+        .choice-btn:disabled { opacity: 0.12; cursor: not-allowed; }
+        .choice-btn:disabled:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: var(--glass-border);
+            color: white;
+            transform: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
 
-        /* Player - matching reference layout */
-        .player {
-            padding: 0 20px 20px;
-        }
+        /* Player */
+        .player { padding: 0 20px 20px; }
 
-        /* Book card in player */
         .player-book {
             display: flex;
             align-items: center;
             gap: 12px;
             padding: 10px 14px;
             background: rgba(255,255,255,0.06);
+            border: 1px solid var(--glass-border);
             border-radius: 14px;
             margin-bottom: 14px;
         }
@@ -983,7 +983,7 @@
         }
 
         .player-book-cover-inner span {
-            font-family: 'Lora', serif;
+            font-family: 'Merriweather', serif;
             font-size: 0.45rem;
             font-weight: 700;
             color: white;
@@ -999,31 +999,27 @@
         }
 
         .player-book-info { flex: 1; min-width: 0; }
-
         .player-book-title {
             font-weight: 600;
-            font-size: 0.82rem;
+            font-size: 0.85rem;
             color: white;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
-
         .player-book-author {
-            font-size: 0.68rem;
-            color: rgba(255,255,255,0.45);
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.4);
         }
-
         .player-chapter-info {
             text-align: right;
-            font-size: 0.6rem;
-            color: rgba(255,255,255,0.35);
+            font-size: 0.62rem;
+            color: rgba(255,255,255,0.3);
             white-space: nowrap;
         }
 
         /* Progress */
         .progress-area { margin-bottom: 4px; }
-
         .progress {
             width: 100%;
             height: 3px;
@@ -1032,27 +1028,18 @@
             cursor: pointer;
             margin-bottom: 5px;
         }
-
         .progress-fill {
             height: 100%;
-            background: white;
+            background: var(--primary);
             border-radius: 2px;
             width: 0%;
             transition: width 0.1s linear;
+            box-shadow: 0 0 6px var(--primary);
         }
+        .time-row { display: flex; justify-content: space-between; }
+        .time-label { font-size: 0.65rem; color: rgba(255,255,255,0.35); font-weight: 500; }
 
-        .time-row {
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .time-label {
-            font-size: 0.65rem;
-            color: rgba(255,255,255,0.35);
-            font-weight: 500;
-        }
-
-        /* Transport controls - matching reference */
+        /* Transport controls */
         .controls {
             display: flex;
             justify-content: center;
@@ -1064,26 +1051,25 @@
         .ctrl-btn {
             background: none;
             border: none;
-            color: rgba(255,255,255,0.6);
+            color: rgba(255,255,255,0.5);
             cursor: pointer;
             padding: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
         }
-
         .ctrl-btn svg { width: 22px; height: 22px; }
 
         .play-btn {
-            width: 52px;
-            height: 52px;
+            width: 56px;
+            height: 56px;
             border-radius: 50%;
-            background: white;
-            color: var(--nvidia-dark);
+            background: var(--primary);
+            color: var(--bg-deep);
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+            box-shadow: 0 0 20px rgba(163, 255, 172, 0.3);
             transition: transform 0.15s;
         }
         .play-btn:hover { transform: scale(1.05); }
@@ -1094,7 +1080,7 @@
             display: none;
             position: absolute;
             inset: 0;
-            background: rgba(17,10,46,0.95);
+            background: rgba(5, 10, 7, 0.95);
             backdrop-filter: blur(10px);
             justify-content: center;
             align-items: center;
@@ -1106,13 +1092,52 @@
         .loading-icon { font-size: 2.2rem; animation: float 2s ease-in-out infinite; }
         .loading-label { color: rgba(255,255,255,0.5); font-size: 0.85rem; }
 
+        /* ========== TAB BAR (Floating Glass Pill) ========== */
+        .tab-bar {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 380px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 32px;
+            padding: 14px 32px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            z-index: 50;
+        }
+
+        .tab-bar-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            cursor: pointer;
+            padding: 4px 16px;
+            background: none;
+            border: none;
+            font-family: inherit;
+            opacity: 0.5;
+            transition: all 0.2s;
+        }
+        .tab-bar-item svg { width: 22px; height: 22px; color: var(--text-muted); }
+        .tab-bar-item span { font-size: 0.65rem; color: var(--text-muted); font-weight: 500; }
+        .tab-bar-item.active { opacity: 1; }
+        .tab-bar-item.active svg { color: var(--primary); }
+        .tab-bar-item.active span { color: var(--primary); }
+
         /* ========== MODALS ========== */
         .modal-bg {
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.45);
-            backdrop-filter: blur(4px);
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(6px);
             justify-content: center;
             align-items: center;
             z-index: 200;
@@ -1121,16 +1146,19 @@
         .modal-bg.active { display: flex; }
 
         .modal {
-            background: white;
-            border-radius: 20px;
-            padding: 24px;
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 28px;
             width: 100%;
-            max-width: 320px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+            max-width: 340px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            color: var(--text-main);
         }
 
         .modal-head {
-            font-size: 1rem;
+            font-family: 'Merriweather', serif;
+            font-size: 1.1rem;
             font-weight: 700;
             text-align: center;
             margin-bottom: 18px;
@@ -1138,39 +1166,48 @@
 
         .modal-input {
             width: 100%;
-            padding: 11px 14px;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            color: var(--text);
+            padding: 12px 14px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            color: var(--text-main);
             font-size: 0.9rem;
             font-family: inherit;
             margin-bottom: 8px;
         }
-        .modal-input:focus { outline: none; border-color: var(--accent); }
+        .modal-input:focus { outline: none; border-color: var(--primary); }
+        .modal-input::placeholder { color: var(--text-muted); }
 
         .modal-label {
             font-size: 0.65rem;
-            color: var(--text-secondary);
+            color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 0.8px;
-            margin-bottom: 5px;
+            margin-bottom: 6px;
             display: block;
         }
 
-        .modal-btns { display: flex; gap: 8px; margin-top: 16px; }
+        .modal-btns { display: flex; gap: 10px; margin-top: 18px; }
         .modal-btn {
             flex: 1;
-            padding: 12px;
-            border-radius: 12px;
+            padding: 13px;
+            border-radius: 14px;
             font-weight: 600;
             font-size: 0.9rem;
             cursor: pointer;
             font-family: inherit;
             transition: all 0.15s;
         }
-        .modal-btn.cancel { background: none; border: 1px solid var(--border); color: var(--text-secondary); }
-        .modal-btn.confirm { background: var(--accent); border: none; color: white; }
+        .modal-btn.cancel {
+            background: none;
+            border: 1px solid var(--glass-border);
+            color: var(--text-muted);
+        }
+        .modal-btn.confirm {
+            background: var(--primary);
+            border: none;
+            color: var(--bg-deep);
+        }
         .modal-btn.confirm:hover { opacity: 0.9; }
 
         /* Delete modal */
@@ -1178,57 +1215,75 @@
             text-align: center;
             margin-bottom: 10px;
         }
-
         .delete-modal-msg {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
+            font-size: 0.82rem;
+            color: var(--text-muted);
             text-align: center;
             line-height: 1.5;
             margin-bottom: 16px;
         }
-
         .delete-confirm-btn {
-            background: #ff3b30 !important;
+            background: #ff6b6b !important;
+            color: white !important;
         }
-        .delete-confirm-btn:disabled {
-            opacity: 0.35;
-            cursor: not-allowed;
+        .delete-confirm-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+        /* Choice modal - slide-up decision sheet */
+        .choice-confirm {
+            align-items: flex-end;
+            padding: 0;
+        }
+        .choice-confirm .modal {
+            max-width: 100%;
+            border-radius: 24px 24px 0 0;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: none;
+            border-top: 1px solid var(--glass-border);
+            padding: 28px 24px 36px;
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.6);
+            position: relative;
         }
 
-        /* Choice modal (matches player colors) */
-        .choice-confirm .modal {
-            background: linear-gradient(160deg, var(--nvidia-deep), var(--nvidia-dark));
-            color: white;
+        .choice-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.4);
+            font-size: 1.5rem;
+            cursor: pointer;
+            line-height: 1;
         }
 
         .choice-number {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            background: var(--nvidia-green);
-            color: white;
-            font-size: 1.1rem;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 14px;
+            font-family: 'Inter', sans-serif;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-weight: 600;
         }
+        .choice-number::before { content: 'Option '; }
 
         .choice-text {
-            font-size: 0.92rem;
-            line-height: 1.55;
-            text-align: center;
-            margin-bottom: 20px;
+            font-family: 'Merriweather', serif;
+            font-size: 1.1rem;
+            line-height: 1.5;
+            margin-bottom: 24px;
             color: rgba(255,255,255,0.85);
+            text-align: left;
         }
 
         .choice-confirm .modal-btn.cancel {
-            border-color: rgba(255,255,255,0.15);
-            color: rgba(255,255,255,0.5);
+            border-color: rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.4);
         }
         .choice-confirm .modal-btn.confirm {
-            background: var(--nvidia-green);
+            background: var(--primary);
+            color: var(--bg-deep);
         }
     </style>
 </head>
@@ -1238,13 +1293,13 @@
         <!-- ========== HOME / LIBRARY SCREEN ========== -->
         <div id="homeScreen" class="screen active">
             <div class="home">
-                <div class="home-tagline">
-                    <div class="tagline-name">Rabbithole</div>
-                    <div class="tagline-text">The Infinite Interactive Audiobook</div>
-                </div>
-                <div class="nvidia-badge">
-                    <svg viewBox="0 0 24 24" fill="#76B900"><path d="M8.948 8.798v-1.43a6.7 6.7 0 0 1 .424-.018c3.922-.124 6.058 3.277 6.058 3.277s-2.467 3.752-5.066 3.752c-.524 0-1.006-.1-1.416-.29V10.87c1.872.228 2.245 1.251 3.403 3.199l2.125-1.72s-1.605-2.388-4.03-2.388c-.555 0-1.065.082-1.498.237zm0-4.075V6.12a7.4 7.4 0 0 1 .424-.013c5.344-.166 8.353 4.46 8.353 4.46s-3.44 5.1-7.02 5.1a5.8 5.8 0 0 1-1.757-.275v-1.222c.524.174 1.088.268 1.686.268 2.87 0 4.925-2.606 4.925-2.606s-1.68-2.883-4.88-2.883c-.592 0-1.16.083-1.73.254zm0-3.03v1.724l-.425.142V2h5.654S10.882.282 8.948.382v1.31zm-1.48 9.066V2.281L5.973 3.204v9.543a7.97 7.97 0 0 0 1.494.012zm-1.494-.877V6.46S3.623 8.743 3.623 11.08c0 1.492.788 2.564.788 2.564l1.562-.762z"/></svg>
-                    Powered by NVIDIA Nemotron <span>&nbsp;· GTC 2026</span>
+                <div class="home-header">
+                    <div class="brand-logo">Rabbithole.</div>
+                    <div class="brand-tagline">The Infinite Interactive Audiobook</div>
+                    <div class="nvidia-badge">
+                        <svg viewBox="0 0 24 24" fill="#a3ffac"><path d="M8.948 8.798v-1.43a6.7 6.7 0 0 1 .424-.018c3.922-.124 6.058 3.277 6.058 3.277s-2.467 3.752-5.066 3.752c-.524 0-1.006-.1-1.416-.29V10.87c1.872.228 2.245 1.251 3.403 3.199l2.125-1.72s-1.605-2.388-4.03-2.388c-.555 0-1.065.082-1.498.237zm0-4.075V6.12a7.4 7.4 0 0 1 .424-.013c5.344-.166 8.353 4.46 8.353 4.46s-3.44 5.1-7.02 5.1a5.8 5.8 0 0 1-1.757-.275v-1.222c.524.174 1.088.268 1.686.268 2.87 0 4.925-2.606 4.925-2.606s-1.68-2.883-4.88-2.883c-.592 0-1.16.083-1.73.254zm0-3.03v1.724l-.425.142V2h5.654S10.882.282 8.948.382v1.31zm-1.48 9.066V2.281L5.973 3.204v9.543a7.97 7.97 0 0 0 1.494.012zm-1.494-.877V6.46S3.623 8.743 3.623 11.08c0 1.492.788 2.564.788 2.564l1.562-.762z"/></svg>
+                        Powered by NVIDIA Nemotron
+                    </div>
                 </div>
 
                 <div class="filter-tabs">
@@ -1272,19 +1327,25 @@
         <!-- ========== UPLOAD SCREEN ========== -->
         <div id="uploadScreen" class="screen">
             <div class="upload-screen-content">
-                <div class="home-tagline">
-                    <div class="tagline-name">Rabbithole</div>
-                    <div class="tagline-text">The Infinite Interactive Audiobook</div>
-                </div>
-                <div class="nvidia-badge">
-                    <svg viewBox="0 0 24 24" fill="#76B900"><path d="M8.948 8.798v-1.43a6.7 6.7 0 0 1 .424-.018c3.922-.124 6.058 3.277 6.058 3.277s-2.467 3.752-5.066 3.752c-.524 0-1.006-.1-1.416-.29V10.87c1.872.228 2.245 1.251 3.403 3.199l2.125-1.72s-1.605-2.388-4.03-2.388c-.555 0-1.065.082-1.498.237zm0-4.075V6.12a7.4 7.4 0 0 1 .424-.013c5.344-.166 8.353 4.46 8.353 4.46s-3.44 5.1-7.02 5.1a5.8 5.8 0 0 1-1.757-.275v-1.222c.524.174 1.088.268 1.686.268 2.87 0 4.925-2.606 4.925-2.606s-1.68-2.883-4.88-2.883c-.592 0-1.16.083-1.73.254zm0-3.03v1.724l-.425.142V2h5.654S10.882.282 8.948.382v1.31zm-1.48 9.066V2.281L5.973 3.204v9.543a7.97 7.97 0 0 0 1.494.012zm-1.494-.877V6.46S3.623 8.743 3.623 11.08c0 1.492.788 2.564.788 2.564l1.562-.762z"/></svg>
-                    Powered by NVIDIA Nemotron <span>&nbsp;· GTC 2026</span>
+                <div class="upload-header">
+                    <div class="brand-logo">Rabbithole.</div>
+                    <div class="brand-tagline">The Infinite Interactive Audiobook</div>
+                    <div class="nvidia-badge">
+                        <svg width="16" height="12" viewBox="0 0 24 18" fill="currentColor"><path d="M8.74.01S4.43.46 1.12 4.54c0 0-2.24 3.85-.28 9.84 0 0 1.23 3.13 4.08 3.6 0 0-1.23-2.1-1.32-4.31 0 0-.2-3.14 2.48-5.79 0 0 1.87-2.07 4.24-2.07l.06-1.75S8.74.01 8.74.01zM9.14 3.87v1.27s-2.9.45-4.32 3.17c0 0-1.67 2.85.06 5.93 0 0-2.3-1.1-2.61-4.32 0 0-.47-3.87 4.43-5.77l2.44-.28zm.12 2.14v1.02s-1.7.1-2.88 1.46c0 0-1.46 1.47-.78 3.42 0 0-.67-.7-.67-2.13 0 0-.2-2.56 4.33-3.77zm.06 2.03v3.53s-.1.77-.72 1.11l-.86.49s.64-1 .44-2.08c0 0-.12-1.07-1.56-2.04 0 0 1.2-.87 2.7-1.01zM12.06.01s4.31.45 7.62 4.53c0 0 2.24 3.85.28 9.84 0 0-1.23 3.13-4.08 3.6 0 0 1.23-2.1 1.32-4.31 0 0 .2-3.14-2.48-5.79 0 0-1.87-2.07-4.24-2.07l-.06-1.75s1.64-.05 1.64-.05zm-.4 3.86v1.27s2.9.45 4.32 3.17c0 0 1.67 2.85-.06 5.93 0 0 2.3-1.1 2.61-4.32 0 0 .47-3.87-4.43-5.77l-2.44-.28zm-.12 2.14v1.02s1.7.1 2.88 1.46c0 0 1.46 1.47.78 3.42 0 0 .67-.7.67-2.13 0 0 .2-2.56-4.33-3.77zm-.06 2.03v3.53s.1.77.72 1.11l.86.49s-.64-1-.44-2.08c0 0 .12-1.07 1.56-2.04 0 0-1.2-.87-2.7-1.01z"/></svg>
+                        Powered by NVIDIA Nemotron
+                    </div>
                 </div>
 
-                <div class="upload-screen-title">Add a New Adventure</div>
-                <div class="upload-screen-subtitle">Turn any book into an interactive experience</div>
+                <div class="upload-drop-zone" id="uploadDropZone">
+                    <div class="upload-drop-icon">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="3" x2="12" y2="15" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </div>
+                    <div class="upload-drop-title" id="uploadDropTitle">Tap to Upload</div>
+                    <div class="upload-drop-desc" id="uploadDropDesc">Supports PDF and TXT from any source</div>
+                </div>
 
                 <div class="upload-steps">
+                    <div class="upload-steps-label">How it works</div>
                     <div class="upload-step">
                         <div class="upload-step-num">1</div>
                         <div class="upload-step-text">
@@ -1308,11 +1369,10 @@
                     </div>
                 </div>
 
-                <button class="upload-main-btn" id="uploadMainBtn">
-                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-                    Upload Book
+                <button class="upload-main-btn" id="uploadMainBtn" disabled>
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Generate Rabbithole
                 </button>
-                <div class="upload-formats">Supports .pdf and .txt files</div>
 
                 <div class="upload-overlay" id="uploadOverlay">
                     <div class="upload-spinner" id="progressSpinner">📖</div>
@@ -1327,6 +1387,7 @@
         <!-- ========== BOOK DETAIL SCREEN ========== -->
         <div id="detailScreen" class="screen">
             <div class="detail">
+                <div class="detail-ambient"></div>
                 <div class="detail-header">
                     <button class="detail-back" id="detailBackBtn">
                         <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
@@ -1335,7 +1396,7 @@
                         <button class="detail-btn-small" id="detailEditBtn">
                             <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
                         </button>
-                        <button class="detail-btn-small" id="detailDeleteBtn" style="color:#ff3b30">
+                        <button class="detail-btn-small" id="detailDeleteBtn" style="color:#ff6b6b">
                             <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                         </button>
                     </div>
@@ -1360,17 +1421,20 @@
                     <div class="detail-buttons">
                         <button class="detail-play-btn" id="detailPlayBtn">
                             <svg fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                            Start Adventure
                         </button>
                     </div>
 
-                    <div class="detail-overview">
-                        <div class="detail-overview-title">Book Overview</div>
-                        <div class="detail-overview-text" id="detailOverview">
-                            Upload a book and let NVIDIA Nemotron create an interactive audio adventure. Each section becomes a branching narrative where your choices shape the story.
+                    <div class="detail-info-sheet">
+                        <div class="detail-overview">
+                            <div class="detail-overview-title">Story Synopsis</div>
+                            <div class="detail-overview-text" id="detailOverview">
+                                Upload a book and let NVIDIA Nemotron create an interactive audio adventure. Each section becomes a branching narrative where your choices shape the story.
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="detail-tags" id="detailTags"></div>
+                        <div class="detail-tags" id="detailTags"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1406,12 +1470,6 @@
                 </div>
             </div>
 
-            <div class="choices" id="choiceIcons">
-                <button class="choice-btn" data-choice="1" disabled>1</button>
-                <button class="choice-btn" data-choice="2" disabled>2</button>
-                <button class="choice-btn" data-choice="3" disabled>3</button>
-            </div>
-
             <div class="player">
                 <div class="player-book">
                     <div class="player-book-cover" id="playerCover">
@@ -1434,6 +1492,12 @@
                         <span class="time-label" id="currentTime">0:00</span>
                         <span class="time-label" id="duration">0:00</span>
                     </div>
+                </div>
+
+                <div class="choices" id="choiceIcons">
+                    <button class="choice-btn" data-choice="1" disabled>1</button>
+                    <button class="choice-btn" data-choice="2" disabled>2</button>
+                    <button class="choice-btn" data-choice="3" disabled>3</button>
                 </div>
 
                 <div class="controls">
@@ -1459,25 +1523,26 @@
         <!-- Bottom tab bar (shared between Home & Upload) -->
         <div class="tab-bar" id="mainTabBar">
             <button class="tab-bar-item active" id="homeTabBtn">
-                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1h-2z"/></svg>
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
                 <span>Home</span>
             </button>
             <button class="tab-bar-item" id="uploadTabBtn">
-                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                 <span>Upload</span>
             </button>
         </div>
         <input type="file" id="fileInput" class="file-input" accept=".pdf,.txt">
     </div>
 
-    <!-- Choice Modal -->
+    <!-- Choice Modal (Slide-up Decision Sheet) -->
     <div class="modal-bg choice-confirm" id="choiceModal">
         <div class="modal">
+            <button class="choice-close" onclick="closeChoiceModal()">&times;</button>
             <div class="choice-number" id="choiceModalNumber">1</div>
             <div class="choice-text" id="choiceModalText">Choice text</div>
             <div class="modal-btns">
                 <button class="modal-btn cancel" onclick="closeChoiceModal()">Cancel</button>
-                <button class="modal-btn confirm" onclick="confirmChoice()">Confirm</button>
+                <button class="modal-btn confirm" onclick="confirmChoice()">Confirm Choice</button>
             </div>
         </div>
     </div>
@@ -1502,7 +1567,7 @@
     <div class="modal-bg" id="deleteModal">
         <div class="modal">
             <div class="delete-modal-icon">
-                <svg width="32" height="32" fill="none" viewBox="0 0 24 24" stroke="#ff3b30" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+                <svg width="32" height="32" fill="none" viewBox="0 0 24 24" stroke="#ff6b6b" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
             </div>
             <div class="modal-head">Delete this book?</div>
             <div class="delete-modal-msg" id="deleteModalMsg">This will permanently remove the book and all its data. This action cannot be undone.</div>
@@ -1589,8 +1654,38 @@
         function hideTabBar() { mainTabBar.style.display = 'none'; }
 
         // ============ UPLOAD ============
-        document.getElementById('uploadMainBtn').addEventListener('click', () => fileInput.click());
-        fileInput.addEventListener('change', e => { if (e.target.files.length) handleFile(e.target.files[0]); });
+        let pendingFile = null;
+        const uploadDropZone = document.getElementById('uploadDropZone');
+        const uploadDropTitle = document.getElementById('uploadDropTitle');
+        const uploadDropDesc = document.getElementById('uploadDropDesc');
+        const uploadMainBtn = document.getElementById('uploadMainBtn');
+
+        // Drop zone click → open file picker
+        uploadDropZone.addEventListener('click', () => fileInput.click());
+
+        // Drag & drop
+        uploadDropZone.addEventListener('dragover', e => { e.preventDefault(); uploadDropZone.classList.add('drag-over'); });
+        uploadDropZone.addEventListener('dragleave', () => uploadDropZone.classList.remove('drag-over'));
+        uploadDropZone.addEventListener('drop', e => {
+            e.preventDefault();
+            uploadDropZone.classList.remove('drag-over');
+            if (e.dataTransfer.files.length) selectFile(e.dataTransfer.files[0]);
+        });
+
+        // File selected via picker
+        fileInput.addEventListener('change', e => { if (e.target.files.length) selectFile(e.target.files[0]); });
+
+        function selectFile(file) {
+            if (!file.name.match(/\.(pdf|txt)$/i)) { alert('PDF or TXT only'); return; }
+            pendingFile = file;
+            uploadDropZone.classList.add('has-file');
+            uploadDropTitle.textContent = file.name;
+            uploadDropDesc.textContent = (file.size / 1024 / 1024).toFixed(1) + ' MB — Tap to change';
+            uploadMainBtn.disabled = false;
+        }
+
+        // Button triggers the actual upload
+        uploadMainBtn.addEventListener('click', () => { if (pendingFile) handleFile(pendingFile); });
 
         async function handleFile(file) {
             if (!file.name.match(/\.(pdf|txt)$/i)) { alert('PDF or TXT only'); return; }
@@ -1643,6 +1738,12 @@
             progressBarFill.style.width = '0%';
             progressText.textContent = 'Processing your book...';
             progressSpinner.textContent = '📖';
+            pendingFile = null;
+            uploadDropZone.classList.remove('has-file');
+            uploadDropTitle.textContent = 'Tap to Upload';
+            uploadDropDesc.textContent = 'Supports PDF and TXT from any source';
+            uploadMainBtn.disabled = true;
+            fileInput.value = '';
         }
 
         // ============ LIBRARY ============
