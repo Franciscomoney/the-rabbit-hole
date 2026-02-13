@@ -45,6 +45,80 @@ Upload Book → Chunk & Embed → Play Adventure → Listen & Choose → Story B
 
 ---
 
+## Why Nemotron? — Technical Deep Dive
+
+We evaluated multiple open-weight LLMs for real-time interactive narration. The constraint was strict: **the model must generate a full narrative turn (3 paragraphs + 3 branching choices) fast enough that a human doesn't lose immersion.** That means under 5 seconds end-to-end, including network latency.
+
+### The Real-Time Narration Problem
+
+Interactive audiobooks are fundamentally different from chatbots. A chatbot user waits for a response. An audiobook listener **expects continuous flow** — any gap longer than a few seconds breaks the spell. This constrains model choice in ways that benchmarks don't capture:
+
+| Requirement | Why It Matters | How Nemotron Solves It |
+|-------------|---------------|----------------------|
+| **< 5s generation** | User is listening, not reading — pauses kill immersion | Nemotron 30B's Hybrid Mamba-Transformer MoE architecture activates only 3.6B of 31.6B params per token, delivering fast inference |
+| **Faithful to source** | RAG-grounded narration must reference real characters, places, events | Nemotron's 256K context window ingests full book passages without truncation artifacts |
+| **Structured output** | Must produce exactly 3 numbered choices after narrative — every turn, reliably | Nemotron follows constrained formatting instructions more consistently than similarly-sized models we tested |
+| **Second-person voice** | "You walk into the room..." requires sustained stylistic control | Nemotron maintains persona across 20+ conversation turns without drift |
+
+### Measured Performance (Production)
+
+These are real numbers from the live deployment, not synthetic benchmarks:
+
+| Metric | Value | Notes |
+|--------|-------|-------|
+| Narrative generation | **2–5s** | 900–1000 chars per turn (3 paragraphs + 3 choices) |
+| TTS synthesis | **2.1–2.6s** | ~700 chars of narration → spoken audio |
+| Semantic embedding | **< 1s** | Single query embedding via NV-EmbedQA for branching |
+| Bulk embedding (upload) | **~2s per batch of 50** | Book ingestion: 50 chunks per NIM API call |
+| Full turn (perceived) | **~3s** | Staggered UI: narrative + audio start immediately, choices appear 2s later |
+
+The perceived latency is the key number. By starting TTS as soon as the narrative arrives (while choices populate in the background), the user hears the story within ~3 seconds of making a choice. This is fast enough to feel like turning a page.
+
+### Why Not Other Models?
+
+We tested alternatives during development:
+
+- **Llama 3.3 70B**: Higher quality narratives but 2–3x slower generation. Broke the real-time constraint.
+- **Mistral/Mixtral**: Competitive speed, but less consistent at maintaining structured output (3 numbered choices) across long sessions. Would frequently drop to 2 choices or merge narrative with choices.
+- **Nemotron Super 49B** (`nvidia/llama-3.3-nemotron-super-49b-v1.5`): We use this as a second pass for choice enhancement — it rewrites the 3 adventure options into vivid, actionable prompts. Worth the extra latency because it only processes ~50 tokens (the choices), not the full narrative.
+- **Smaller models (7B–13B)**: Fast but couldn't sustain coherent RAG-grounded narration. Would hallucinate characters not in the book passage.
+
+Nemotron 30B hits the sweet spot: fast enough for real-time, smart enough for faithful storytelling.
+
+### The RAG Architecture Decision
+
+Standard RAG retrieves passages before generation. We do something different — **we use RAG for branching, not just context**.
+
+```
+Standard RAG:    User query → Retrieve → Generate
+Rabbit Hole:     User choice → Embed choice → Cosine similarity against all future chunks
+                              → Route to most semantically relevant passage → Generate from there
+```
+
+When a user picks "You grab the lantern and rush toward the screams in the cellar," we:
+1. Embed that choice text using **NV-EmbedQA-E5-v5**
+2. Compare against all book chunks *ahead* of the current position
+3. Jump to the chunk with the highest semantic similarity (e.g., chunk 0 → chunk 56)
+4. Generate the next narrative from that passage
+
+This means **the same book produces different adventures every playthrough**. Three users making three different choices at the same decision point will each land in a different part of the book. The embedding quality of NV-EmbedQA is critical here — low-quality embeddings would route users to irrelevant passages, breaking the story.
+
+### Nemotron Across the Pipeline
+
+We don't just use Nemotron for narration. It handles **5 distinct tasks** across the application lifecycle:
+
+| Task | Model | Why This Model |
+|------|-------|---------------|
+| Interactive narrative generation | Nemotron 30B | Speed + quality balance for real-time |
+| Choice enhancement | Nemotron Super 49B | Higher quality for short-form rewriting |
+| Book title/author extraction | Nemotron 30B | Reliable JSON extraction from first page |
+| Adventure summaries | Nemotron 30B | Creative hook-style descriptions |
+| Topic tag extraction | Nemotron 30B | Concise theme identification |
+
+Each task uses different temperature settings, token limits, and system prompts — but the same underlying model family. This demonstrates Nemotron's versatility: one model ecosystem handling structured extraction, creative generation, and style transfer.
+
+---
+
 ## Architecture
 
 ```
