@@ -1,0 +1,2139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>The Rabbit Hole | Interactive Audio Adventures</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #ffffff;
+            --bg-secondary: #f5f5f7;
+            --text: #1d1d1f;
+            --text-secondary: #6e6e73;
+            --text-tertiary: #aeaeb2;
+            --border: #e5e5ea;
+            --nvidia-green: #76B900;
+            --nvidia-dark: #1a2e00;
+            --nvidia-mid: #2a4a00;
+            --nvidia-deep: #3d6b00;
+            --accent: #76B900;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f2f2f7;
+            color: var(--text);
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .app {
+            width: 100%;
+            max-width: 430px;
+            height: 100vh;
+            height: 100dvh;
+            background: var(--bg);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        @media (min-width: 431px) {
+            body { padding: 20px; }
+            .app {
+                height: 92vh;
+                max-height: 900px;
+                border-radius: 40px;
+                box-shadow: 0 25px 80px rgba(0,0,0,0.12);
+                border: 1px solid rgba(0,0,0,0.06);
+            }
+        }
+
+        .screen { display: none; flex-direction: column; flex: 1; overflow: hidden; }
+        .screen.active { display: flex; }
+
+        /* ========== HOME / LIBRARY SCREEN ========== */
+        .home {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg);
+        }
+
+        .home-tagline {
+            padding: 18px 20px 2px;
+        }
+
+        .tagline-name {
+            font-family: 'Lora', serif;
+            font-weight: 700;
+            color: var(--nvidia-deep);
+            font-size: 1.5rem;
+            line-height: 1.2;
+        }
+
+        .tagline-text {
+            color: var(--text-secondary);
+            font-size: 0.78rem;
+            margin-top: 2px;
+            letter-spacing: 0.2px;
+        }
+
+        .home-actions {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .icon-btn {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text);
+            transition: background 0.15s;
+        }
+        .icon-btn:hover { background: var(--bg-secondary); }
+
+        .icon-btn svg { width: 20px; height: 20px; }
+
+        /* Filter tabs */
+        .filter-tabs {
+            display: flex;
+            gap: 8px;
+            padding: 14px 20px 8px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .filter-tabs::-webkit-scrollbar { display: none; }
+
+        .filter-tab {
+            padding: 7px 16px;
+            border-radius: 18px;
+            border: none;
+            background: var(--bg-secondary);
+            font-size: 0.78rem;
+            font-weight: 500;
+            cursor: pointer;
+            white-space: nowrap;
+            color: var(--text-secondary);
+            font-family: inherit;
+            transition: all 0.15s;
+        }
+        .filter-tab.active {
+            background: var(--text);
+            color: white;
+        }
+
+        /* Scrollable content area */
+        .home-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 80px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Section headers */
+        .section-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 20px 20px 10px;
+        }
+        .section-label {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+        .section-count {
+            font-size: 0.78rem;
+            color: var(--text-tertiary);
+            font-weight: 400;
+            margin-left: 6px;
+        }
+        .section-link {
+            font-size: 0.78rem;
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        /* Book grid - matching reference 3 columns */
+        .book-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            padding: 0 20px;
+        }
+
+        .book-cell {
+            cursor: pointer;
+            transition: transform 0.15s;
+        }
+        .book-cell:active { transform: scale(0.96); }
+
+        .book-cover {
+            width: 100%;
+            aspect-ratio: 2.8 / 4;
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .book-cover-inner {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 8px;
+            text-align: center;
+        }
+
+        .book-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .book-cover-title {
+            font-family: 'Lora', serif;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: white;
+            line-height: 1.3;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+            word-break: break-word;
+        }
+
+        .book-cover-author {
+            font-size: 0.55rem;
+            font-weight: 500;
+            color: rgba(255,255,255,0.8);
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .book-name {
+            font-weight: 600;
+            font-size: 0.75rem;
+            color: var(--text);
+            line-height: 1.25;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .book-author {
+            font-size: 0.68rem;
+            color: var(--text-tertiary);
+            margin-top: 2px;
+        }
+
+        /* Book list rows */
+        .book-list { padding: 0 20px; }
+
+        .book-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--bg-secondary);
+            cursor: pointer;
+        }
+        .book-row:last-child { border: none; }
+
+        .book-row-cover {
+            width: 48px;
+            height: 64px;
+            border-radius: 6px;
+            flex-shrink: 0;
+            overflow: hidden;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+        }
+
+        .book-row-cover-inner {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px;
+            position: relative;
+        }
+
+        .book-row-cover-inner span {
+            font-family: 'Lora', serif;
+            font-size: 0.5rem;
+            font-weight: 700;
+            color: white;
+            text-align: center;
+            line-height: 1.2;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .book-row-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+
+        .book-row-info { flex: 1; min-width: 0; }
+
+        .book-row-title {
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .book-row-meta {
+            font-size: 0.72rem;
+            color: var(--text-secondary);
+        }
+
+        .book-row-stats {
+            display: flex;
+            gap: 10px;
+            margin-top: 3px;
+            font-size: 0.68rem;
+            color: var(--text-tertiary);
+        }
+
+        .book-row-actions {
+            display: flex;
+            gap: 2px;
+        }
+
+        .row-action {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.75rem;
+            color: var(--text-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .row-action:hover { background: var(--bg-secondary); }
+        .row-action.del:hover { color: #ff3b30; }
+
+        /* Empty state */
+        .empty {
+            text-align: center;
+            padding: 60px 30px;
+        }
+        .empty-icon { font-size: 3rem; margin-bottom: 14px; opacity: 0.5; }
+        .empty-text {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Upload FAB - dark pill */
+        .fab {
+            position: absolute;
+            bottom: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            height: 48px;
+            padding: 0 28px;
+            border-radius: 24px;
+            background: var(--text);
+            border: none;
+            color: white;
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            transition: all 0.2s;
+            font-family: inherit;
+            white-space: nowrap;
+            z-index: 10;
+        }
+        .fab:hover { transform: translateX(-50%) translateY(-1px); box-shadow: 0 6px 28px rgba(0,0,0,0.25); }
+        .fab:active { transform: translateX(-50%) translateY(0); }
+
+        .fab svg { width: 18px; height: 18px; }
+
+        /* Upload overlay */
+        .upload-overlay {
+            display: none;
+            position: absolute;
+            inset: 0;
+            background: rgba(255,255,255,0.97);
+            backdrop-filter: blur(20px);
+            z-index: 100;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+        }
+        .upload-overlay.active { display: flex; }
+
+        .upload-spinner { font-size: 3rem; animation: float 2s ease-in-out infinite; }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .upload-status {
+            font-size: 0.92rem;
+            font-weight: 500;
+            text-align: center;
+            padding: 0 40px;
+            color: var(--text);
+        }
+
+        .upload-bar {
+            width: 160px;
+            height: 3px;
+            background: var(--border);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .upload-bar-fill {
+            height: 100%;
+            background: var(--accent);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .file-input { display: none; }
+
+        /* Upload screen */
+        .upload-screen-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0 0 30px;
+            text-align: center;
+            position: relative;
+            overflow-y: auto;
+        }
+
+        .upload-screen-content .home-tagline {
+            width: 100%;
+            text-align: left;
+        }
+
+        .upload-screen-content .nvidia-badge {
+            align-self: flex-start;
+        }
+
+        .upload-screen-title {
+            margin-top: 32px;
+            font-family: 'Lora', serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 6px;
+        }
+
+        .upload-screen-subtitle {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            margin-bottom: 36px;
+        }
+
+        .upload-steps {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-bottom: 40px;
+            padding: 0 10px;
+        }
+
+        .upload-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            text-align: left;
+        }
+
+        .upload-step-num {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            background: var(--bg-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.8rem;
+            color: var(--nvidia-deep);
+            flex-shrink: 0;
+        }
+
+        .upload-step-text {
+            flex: 1;
+            padding-top: 4px;
+        }
+
+        .upload-step-text strong {
+            display: block;
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 2px;
+        }
+
+        .upload-step-text span {
+            font-size: 0.76rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        .upload-main-btn {
+            width: calc(100% - 20px);
+            padding: 16px;
+            border: none;
+            border-radius: 14px;
+            background: linear-gradient(145deg, var(--nvidia-deep), #76B900);
+            color: white;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 16px rgba(60, 100, 0, 0.3);
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+
+        .upload-main-btn:active {
+            transform: scale(0.97);
+            box-shadow: 0 2px 8px rgba(60, 100, 0, 0.2);
+        }
+
+        .upload-main-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .upload-formats {
+            margin-top: 12px;
+            font-size: 0.7rem;
+            color: var(--text-tertiary);
+        }
+
+        /* Bottom tab bar */
+        .tab-bar {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 8px 0 12px;
+            border-top: 1px solid var(--border);
+            background: var(--bg);
+            position: relative;
+            z-index: 5;
+        }
+
+        .tab-bar-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            cursor: pointer;
+            padding: 4px 16px;
+            background: none;
+            border: none;
+            font-family: inherit;
+        }
+
+        .tab-bar-item svg { width: 22px; height: 22px; color: var(--text-tertiary); }
+        .tab-bar-item span { font-size: 0.6rem; color: var(--text-tertiary); font-weight: 500; }
+        .tab-bar-item.active svg { color: var(--accent); }
+        .tab-bar-item.active span { color: var(--accent); }
+
+        /* NVIDIA badge */
+        .nvidia-badge {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 10px 20px 4px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            color: var(--nvidia-green);
+            letter-spacing: 0.3px;
+        }
+
+        .nvidia-badge svg { width: 14px; height: 14px; flex-shrink: 0; }
+        .nvidia-badge span { color: var(--text-tertiary); font-weight: 400; }
+
+        /* ========== BOOK DETAIL SCREEN ========== */
+        .detail { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--bg); }
+
+        .detail-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 20px;
+        }
+
+        .detail-back {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .detail-actions { display: flex; gap: 6px; }
+
+        .detail-scroll {
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .detail-cover-area {
+            display: flex;
+            justify-content: center;
+            padding: 10px 20px 20px;
+        }
+
+        .detail-cover {
+            width: 160px;
+            aspect-ratio: 2.8 / 4;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+        }
+
+        .detail-cover-inner {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            text-align: center;
+            position: relative;
+        }
+
+        .detail-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .detail-cover-title {
+            font-family: 'Lora', serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: white;
+            line-height: 1.25;
+            text-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+
+        .detail-cover-author {
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: rgba(255,255,255,0.85);
+            margin-top: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .detail-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            text-align: center;
+            padding: 0 20px;
+            color: var(--text);
+        }
+
+        .detail-author-name {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            text-align: center;
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .detail-author-name svg { width: 14px; height: 14px; color: var(--accent); }
+
+        .detail-buttons {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            padding: 18px 20px;
+        }
+
+        .detail-play-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--accent);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            box-shadow: 0 4px 16px rgba(88,86,214,0.35);
+            transition: transform 0.15s;
+        }
+        .detail-play-btn:hover { transform: scale(1.05); }
+        .detail-play-btn svg { width: 22px; height: 22px; }
+
+        .detail-overview {
+            padding: 0 20px 16px;
+        }
+
+        .detail-overview-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+
+        .detail-overview-text {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            line-height: 1.55;
+        }
+
+        .detail-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            padding: 4px 20px 20px;
+        }
+
+        .detail-tag {
+            padding: 5px 12px;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            background: none;
+        }
+
+        /* ========== READER SCREEN ========== */
+        #readerScreen {
+            background: linear-gradient(170deg, var(--nvidia-deep) 0%, var(--nvidia-mid) 40%, var(--nvidia-dark) 100%);
+        }
+
+        .reader-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 16px;
+            position: relative;
+        }
+
+        .reader-back {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.7);
+            cursor: pointer;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+        }
+
+        .reader-header-title {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Lora', serif;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: white;
+            letter-spacing: 0.3px;
+        }
+
+        .reader-header-btn {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.5);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+        }
+        .reader-header-btn:active { background: rgba(255,255,255,0.1); }
+
+        .reader-header-btn svg { width: 18px; height: 18px; }
+
+        /* NVIDIA model bar */
+        .model-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            padding: 0 20px 8px;
+            font-size: 0.6rem;
+            color: rgba(255,255,255,0.3);
+        }
+
+        .model-tag { display: flex; align-items: center; gap: 4px; }
+        .model-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--nvidia-green); }
+        .model-label { color: var(--nvidia-green); font-weight: 600; }
+
+        /* Story area - centered quote style like reference */
+        .story-area {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 32px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .story-text-wrapper {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .story-text-wrapper::before,
+        .story-text-wrapper::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 80px;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .story-text-wrapper::before {
+            top: 0;
+            background: linear-gradient(to bottom, var(--nvidia-deep) 0%, transparent 100%);
+        }
+
+        .story-text-wrapper::after {
+            bottom: 0;
+            background: linear-gradient(to top, var(--nvidia-mid) 0%, transparent 100%);
+        }
+
+        .story-text {
+            position: absolute;
+            width: 100%;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: transform;
+        }
+
+        .story-text .line {
+            display: block;
+            padding: 12px 0;
+            font-family: 'Lora', serif;
+            font-size: 1.3rem;
+            font-weight: 400;
+            line-height: 1.6;
+            text-align: left;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-origin: left center;
+        }
+
+        .story-text .line.passed {
+            opacity: 0.12;
+            transform: scale(0.93);
+            filter: blur(2px);
+            color: rgba(255,255,255,0.35);
+        }
+
+        .story-text .line.current {
+            opacity: 1;
+            transform: scale(1);
+            filter: blur(0);
+            color: white;
+        }
+
+        .story-text .line.upcoming { color: rgba(255,255,255,0.45); }
+        .story-text .line.upcoming-1 { opacity: 0.5; transform: scale(0.97); filter: blur(0.3px); }
+        .story-text .line.upcoming-2 { opacity: 0.3; transform: scale(0.95); filter: blur(0.8px); }
+        .story-text .line.upcoming-3 { opacity: 0.18; transform: scale(0.93); filter: blur(1.2px); }
+        .story-text .line.upcoming-far { opacity: 0.08; transform: scale(0.91); filter: blur(1.8px); }
+
+        /* Choice buttons - right side floating */
+        .choices {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 50;
+        }
+
+        .choice-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.08);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.12);
+            color: white;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: inherit;
+        }
+        .choice-btn:hover {
+            background: var(--nvidia-green);
+            border-color: var(--nvidia-green);
+            transform: scale(1.08);
+        }
+        .choice-btn:disabled { opacity: 0.15; cursor: not-allowed; }
+        .choice-btn:disabled:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.12); transform: none; }
+
+        /* Player - matching reference layout */
+        .player {
+            padding: 0 20px 20px;
+        }
+
+        /* Book card in player */
+        .player-book {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 14px;
+            margin-bottom: 14px;
+        }
+
+        .player-book-cover {
+            width: 42px;
+            height: 56px;
+            border-radius: 6px;
+            flex-shrink: 0;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .player-book-cover-inner {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px;
+            position: relative;
+        }
+
+        .player-book-cover-inner span {
+            font-family: 'Lora', serif;
+            font-size: 0.45rem;
+            font-weight: 700;
+            color: white;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        .player-book-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+
+        .player-book-info { flex: 1; min-width: 0; }
+
+        .player-book-title {
+            font-weight: 600;
+            font-size: 0.82rem;
+            color: white;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .player-book-author {
+            font-size: 0.68rem;
+            color: rgba(255,255,255,0.45);
+        }
+
+        .player-chapter-info {
+            text-align: right;
+            font-size: 0.6rem;
+            color: rgba(255,255,255,0.35);
+            white-space: nowrap;
+        }
+
+        /* Progress */
+        .progress-area { margin-bottom: 4px; }
+
+        .progress {
+            width: 100%;
+            height: 3px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            cursor: pointer;
+            margin-bottom: 5px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: white;
+            border-radius: 2px;
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+
+        .time-row {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .time-label {
+            font-size: 0.65rem;
+            color: rgba(255,255,255,0.35);
+            font-weight: 500;
+        }
+
+        /* Transport controls - matching reference */
+        .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 24px;
+            padding-top: 8px;
+        }
+
+        .ctrl-btn {
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.6);
+            cursor: pointer;
+            padding: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ctrl-btn svg { width: 22px; height: 22px; }
+
+        .play-btn {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: white;
+            color: var(--nvidia-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+            transition: transform 0.15s;
+        }
+        .play-btn:hover { transform: scale(1.05); }
+        .play-btn svg { width: 22px; height: 22px; }
+
+        /* Loading overlay */
+        .loading {
+            display: none;
+            position: absolute;
+            inset: 0;
+            background: rgba(17,10,46,0.95);
+            backdrop-filter: blur(10px);
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .loading.active { display: flex; }
+        .loading-icon { font-size: 2.2rem; animation: float 2s ease-in-out infinite; }
+        .loading-label { color: rgba(255,255,255,0.5); font-size: 0.85rem; }
+
+        /* ========== MODALS ========== */
+        .modal-bg {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            backdrop-filter: blur(4px);
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+            padding: 20px;
+        }
+        .modal-bg.active { display: flex; }
+
+        .modal {
+            background: white;
+            border-radius: 20px;
+            padding: 24px;
+            width: 100%;
+            max-width: 320px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+        }
+
+        .modal-head {
+            font-size: 1rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 18px;
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 11px 14px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text);
+            font-size: 0.9rem;
+            font-family: inherit;
+            margin-bottom: 8px;
+        }
+        .modal-input:focus { outline: none; border-color: var(--accent); }
+
+        .modal-label {
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .modal-btns { display: flex; gap: 8px; margin-top: 16px; }
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.15s;
+        }
+        .modal-btn.cancel { background: none; border: 1px solid var(--border); color: var(--text-secondary); }
+        .modal-btn.confirm { background: var(--accent); border: none; color: white; }
+        .modal-btn.confirm:hover { opacity: 0.9; }
+
+        /* Delete modal */
+        .delete-modal-icon {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .delete-modal-msg {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            text-align: center;
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+
+        .delete-confirm-btn {
+            background: #ff3b30 !important;
+        }
+        .delete-confirm-btn:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+        }
+
+        /* Choice modal (matches player colors) */
+        .choice-confirm .modal {
+            background: linear-gradient(160deg, var(--nvidia-deep), var(--nvidia-dark));
+            color: white;
+        }
+
+        .choice-number {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--nvidia-green);
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 14px;
+        }
+
+        .choice-text {
+            font-size: 0.92rem;
+            line-height: 1.55;
+            text-align: center;
+            margin-bottom: 20px;
+            color: rgba(255,255,255,0.85);
+        }
+
+        .choice-confirm .modal-btn.cancel {
+            border-color: rgba(255,255,255,0.15);
+            color: rgba(255,255,255,0.5);
+        }
+        .choice-confirm .modal-btn.confirm {
+            background: var(--nvidia-green);
+        }
+    </style>
+</head>
+<body>
+    <div class="app" id="app">
+
+        <!-- ========== HOME / LIBRARY SCREEN ========== -->
+        <div id="homeScreen" class="screen active">
+            <div class="home">
+                <div class="home-tagline">
+                    <div class="tagline-name">Rabbithole</div>
+                    <div class="tagline-text">The Infinite Interactive Audiobook</div>
+                </div>
+                <div class="nvidia-badge">
+                    <svg viewBox="0 0 24 24" fill="#76B900"><path d="M8.948 8.798v-1.43a6.7 6.7 0 0 1 .424-.018c3.922-.124 6.058 3.277 6.058 3.277s-2.467 3.752-5.066 3.752c-.524 0-1.006-.1-1.416-.29V10.87c1.872.228 2.245 1.251 3.403 3.199l2.125-1.72s-1.605-2.388-4.03-2.388c-.555 0-1.065.082-1.498.237zm0-4.075V6.12a7.4 7.4 0 0 1 .424-.013c5.344-.166 8.353 4.46 8.353 4.46s-3.44 5.1-7.02 5.1a5.8 5.8 0 0 1-1.757-.275v-1.222c.524.174 1.088.268 1.686.268 2.87 0 4.925-2.606 4.925-2.606s-1.68-2.883-4.88-2.883c-.592 0-1.16.083-1.73.254zm0-3.03v1.724l-.425.142V2h5.654S10.882.282 8.948.382v1.31zm-1.48 9.066V2.281L5.973 3.204v9.543a7.97 7.97 0 0 0 1.494.012zm-1.494-.877V6.46S3.623 8.743 3.623 11.08c0 1.492.788 2.564.788 2.564l1.562-.762z"/></svg>
+                    Powered by NVIDIA Nemotron <span>&nbsp;· GTC 2026</span>
+                </div>
+
+                <div class="filter-tabs">
+                    <button class="filter-tab active" id="tabAll">All</button>
+                    <button class="filter-tab" id="tabRecent">Audiobook</button>
+                    <button class="filter-tab" id="tabFavorites">Series</button>
+                </div>
+
+                <div class="home-scroll">
+                    <div class="section-head">
+                        <div><span class="section-label">Your Library</span><span class="section-count" id="bookCount"></span></div>
+                        <a class="section-link">See all</a>
+                    </div>
+                    <div class="book-grid" id="bookGrid"></div>
+
+                    <div class="section-head" id="allBooksHead" style="display:none">
+                        <span class="section-label">All Books</span>
+                    </div>
+                    <div class="book-list" id="bookList"></div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ========== UPLOAD SCREEN ========== -->
+        <div id="uploadScreen" class="screen">
+            <div class="upload-screen-content">
+                <div class="home-tagline">
+                    <div class="tagline-name">Rabbithole</div>
+                    <div class="tagline-text">The Infinite Interactive Audiobook</div>
+                </div>
+                <div class="nvidia-badge">
+                    <svg viewBox="0 0 24 24" fill="#76B900"><path d="M8.948 8.798v-1.43a6.7 6.7 0 0 1 .424-.018c3.922-.124 6.058 3.277 6.058 3.277s-2.467 3.752-5.066 3.752c-.524 0-1.006-.1-1.416-.29V10.87c1.872.228 2.245 1.251 3.403 3.199l2.125-1.72s-1.605-2.388-4.03-2.388c-.555 0-1.065.082-1.498.237zm0-4.075V6.12a7.4 7.4 0 0 1 .424-.013c5.344-.166 8.353 4.46 8.353 4.46s-3.44 5.1-7.02 5.1a5.8 5.8 0 0 1-1.757-.275v-1.222c.524.174 1.088.268 1.686.268 2.87 0 4.925-2.606 4.925-2.606s-1.68-2.883-4.88-2.883c-.592 0-1.16.083-1.73.254zm0-3.03v1.724l-.425.142V2h5.654S10.882.282 8.948.382v1.31zm-1.48 9.066V2.281L5.973 3.204v9.543a7.97 7.97 0 0 0 1.494.012zm-1.494-.877V6.46S3.623 8.743 3.623 11.08c0 1.492.788 2.564.788 2.564l1.562-.762z"/></svg>
+                    Powered by NVIDIA Nemotron <span>&nbsp;· GTC 2026</span>
+                </div>
+
+                <div class="upload-screen-title">Add a New Adventure</div>
+                <div class="upload-screen-subtitle">Turn any book into an interactive experience</div>
+
+                <div class="upload-steps">
+                    <div class="upload-step">
+                        <div class="upload-step-num">1</div>
+                        <div class="upload-step-text">
+                            <strong>Upload your book</strong>
+                            <span>Drop in any PDF or TXT file — novels, short stories, anything goes.</span>
+                        </div>
+                    </div>
+                    <div class="upload-step">
+                        <div class="upload-step-num">2</div>
+                        <div class="upload-step-text">
+                            <strong>We prepare your adventure</strong>
+                            <span>NVIDIA Nemotron reads, understands and transforms your text into an interactive world.</span>
+                        </div>
+                    </div>
+                    <div class="upload-step">
+                        <div class="upload-step-num">3</div>
+                        <div class="upload-step-text">
+                            <strong>Enjoy the ride</strong>
+                            <span>Listen, make choices, and shape the story. No two adventures are ever the same.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="upload-main-btn" id="uploadMainBtn">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                    Upload Book
+                </button>
+                <div class="upload-formats">Supports .pdf and .txt files</div>
+
+                <div class="upload-overlay" id="uploadOverlay">
+                    <div class="upload-spinner" id="progressSpinner">📖</div>
+                    <div class="upload-status" id="progressText">Processing your book...</div>
+                    <div class="upload-bar">
+                        <div class="upload-bar-fill" id="progressBarFill"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== BOOK DETAIL SCREEN ========== -->
+        <div id="detailScreen" class="screen">
+            <div class="detail">
+                <div class="detail-header">
+                    <button class="detail-back" id="detailBackBtn">
+                        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+                    </button>
+                    <div class="detail-actions">
+                        <button class="detail-btn-small" id="detailEditBtn">
+                            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                        </button>
+                        <button class="detail-btn-small" id="detailDeleteBtn" style="color:#ff3b30">
+                            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="detail-scroll">
+                    <div class="detail-cover-area">
+                        <div class="detail-cover" id="detailCover">
+                            <div class="detail-cover-inner" id="detailCoverInner">
+                                <div class="detail-cover-title" id="detailCoverTitle">Book Title</div>
+                                <div class="detail-cover-author" id="detailCoverAuthor">Author</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="detail-title" id="detailTitle">Book Title</div>
+                    <div class="detail-author-name" id="detailAuthor">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>
+                        Author Name
+                    </div>
+
+                    <div class="detail-buttons">
+                        <button class="detail-play-btn" id="detailPlayBtn">
+                            <svg fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        </button>
+                    </div>
+
+                    <div class="detail-overview">
+                        <div class="detail-overview-title">Book Overview</div>
+                        <div class="detail-overview-text" id="detailOverview">
+                            Upload a book and let NVIDIA Nemotron create an interactive audio adventure. Each section becomes a branching narrative where your choices shape the story.
+                        </div>
+                    </div>
+
+                    <div class="detail-tags" id="detailTags"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== READER SCREEN ========== -->
+        <div id="readerScreen" class="screen">
+            <div class="reader-header">
+                <button class="reader-back" id="backBtn">
+                    <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+                </button>
+                <div class="reader-header-title">Rabbithole</div>
+                <button class="reader-header-btn" id="shareBtn">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+                </button>
+            </div>
+
+            <div class="model-bar">
+                <div class="model-tag">
+                    <span class="model-dot"></span>
+                    <span class="model-label">LLM</span>
+                    <span>Nemotron 30B</span>
+                </div>
+                <div class="model-tag">
+                    <span class="model-dot"></span>
+                    <span class="model-label">EMB</span>
+                    <span>NV-EmbedQA</span>
+                </div>
+            </div>
+
+            <div class="story-area">
+                <div class="story-text-wrapper">
+                    <div class="story-text" id="storyText"></div>
+                </div>
+            </div>
+
+            <div class="choices" id="choiceIcons">
+                <button class="choice-btn" data-choice="1" disabled>1</button>
+                <button class="choice-btn" data-choice="2" disabled>2</button>
+                <button class="choice-btn" data-choice="3" disabled>3</button>
+            </div>
+
+            <div class="player">
+                <div class="player-book">
+                    <div class="player-book-cover" id="playerCover">
+                        <div class="player-book-cover-inner" id="playerCoverInner">
+                            <span></span>
+                        </div>
+                    </div>
+                    <div class="player-book-info">
+                        <div class="player-book-title" id="playerTitle">Book Title</div>
+                        <div class="player-book-author" id="playerAuthor">Interactive Adventure</div>
+                    </div>
+                    <div class="player-chapter-info" id="playerChapter">Section 1 / 1</div>
+                </div>
+
+                <div class="progress-area">
+                    <div class="progress" id="progressBar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div class="time-row">
+                        <span class="time-label" id="currentTime">0:00</span>
+                        <span class="time-label" id="duration">0:00</span>
+                    </div>
+                </div>
+
+                <div class="controls">
+                    <button class="ctrl-btn" id="rewindBtn">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0019 16V8a1 1 0 00-1.6-.8l-5.333 4zM4.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0011 16V8a1 1 0 00-1.6-.8l-5.334 4z"/></svg>
+                    </button>
+                    <button class="ctrl-btn play-btn" id="playPauseBtn">
+                        <svg id="playIcon" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        <svg id="pauseIcon" fill="currentColor" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                    </button>
+                    <button class="ctrl-btn" id="forwardBtn">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M11.933 12.8a1 1 0 000-1.6L6.6 7.2A1 1 0 005 8v8a1 1 0 001.6.8l5.333-4zM19.933 12.8a1 1 0 000-1.6l-5.333-4A1 1 0 0013 8v8a1 1 0 001.6.8l5.333-4z"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="loading" id="loadingOverlay">
+                <div class="loading-icon">✨</div>
+                <div class="loading-label">Creating your adventure...</div>
+            </div>
+        </div>
+
+        <!-- Bottom tab bar (shared between Home & Upload) -->
+        <div class="tab-bar" id="mainTabBar">
+            <button class="tab-bar-item active" id="homeTabBtn">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1h-2z"/></svg>
+                <span>Home</span>
+            </button>
+            <button class="tab-bar-item" id="uploadTabBtn">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                <span>Upload</span>
+            </button>
+        </div>
+        <input type="file" id="fileInput" class="file-input" accept=".pdf,.txt">
+    </div>
+
+    <!-- Choice Modal -->
+    <div class="modal-bg choice-confirm" id="choiceModal">
+        <div class="modal">
+            <div class="choice-number" id="choiceModalNumber">1</div>
+            <div class="choice-text" id="choiceModalText">Choice text</div>
+            <div class="modal-btns">
+                <button class="modal-btn cancel" onclick="closeChoiceModal()">Cancel</button>
+                <button class="modal-btn confirm" onclick="confirmChoice()">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div class="modal-bg" id="editModal">
+        <div class="modal">
+            <div class="modal-head">Edit Book</div>
+            <input type="hidden" id="editBookId">
+            <label class="modal-label">Title</label>
+            <input type="text" class="modal-input" id="editTitle" placeholder="Book title">
+            <label class="modal-label">Author</label>
+            <input type="text" class="modal-input" id="editAuthor" placeholder="Author name">
+            <div class="modal-btns">
+                <button class="modal-btn cancel" onclick="closeEditModal()">Cancel</button>
+                <button class="modal-btn confirm" onclick="saveBookEdit()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal-bg" id="deleteModal">
+        <div class="modal">
+            <div class="delete-modal-icon">
+                <svg width="32" height="32" fill="none" viewBox="0 0 24 24" stroke="#ff3b30" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+            </div>
+            <div class="modal-head">Delete this book?</div>
+            <div class="delete-modal-msg" id="deleteModalMsg">This will permanently remove the book and all its data. This action cannot be undone.</div>
+            <label class="modal-label">Type DELETE to confirm</label>
+            <input type="text" class="modal-input" id="deleteConfirmInput" placeholder="DELETE" autocomplete="off" spellcheck="false">
+            <div class="modal-btns">
+                <button class="modal-btn cancel" onclick="closeDeleteModal()">Cancel</button>
+                <button class="modal-btn confirm delete-confirm-btn" id="deleteConfirmBtn" onclick="confirmDelete()" disabled>Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============ STATE ============
+        let sessionId = null;
+        let currentSection = 1;
+        let totalSections = 1;
+        let bookTitle = '';
+        let bookAuthor = '';
+        let currentBookId = null;
+        let currentBookGradient = '';
+        let currentBookCover = null;
+        let isPlaying = false;
+        let isSpeaking = false;
+        let currentAudio = null;
+        let progressInterval = null;
+        let currentTimeVal = 0;
+        let estimatedDuration = 10;
+        let currentChoices = [];
+        let selectedChoiceIndex = null;
+        let storyLines = [];
+        let currentLineIndex = 0;
+        let lineTimings = [];
+
+        // ============ ELEMENTS ============
+        const homeScreen = document.getElementById('homeScreen');
+        const uploadScreen = document.getElementById('uploadScreen');
+        const detailScreen = document.getElementById('detailScreen');
+        const readerScreen = document.getElementById('readerScreen');
+        const uploadOverlay = document.getElementById('uploadOverlay');
+        const progressSpinner = document.getElementById('progressSpinner');
+        const progressText = document.getElementById('progressText');
+        const progressBarFill = document.getElementById('progressBarFill');
+        const fileInput = document.getElementById('fileInput');
+        const bookGrid = document.getElementById('bookGrid');
+        const bookList = document.getElementById('bookList');
+        const backBtn = document.getElementById('backBtn');
+        const playerTitle = document.getElementById('playerTitle');
+        const playerChapter = document.getElementById('playerChapter');
+        const storyText = document.getElementById('storyText');
+        const progressFill = document.getElementById('progressFill');
+        const currentTimeEl = document.getElementById('currentTime');
+        const durationEl = document.getElementById('duration');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const playIcon = document.getElementById('playIcon');
+        const pauseIcon = document.getElementById('pauseIcon');
+        const choiceIcons = document.getElementById('choiceIcons');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const editModal = document.getElementById('editModal');
+        const choiceModal = document.getElementById('choiceModal');
+
+        // ============ TAB NAVIGATION ============
+        const mainTabBar = document.getElementById('mainTabBar');
+        const tabBtns = document.querySelectorAll('.tab-bar-item');
+        document.getElementById('homeTabBtn').addEventListener('click', () => switchTab('home'));
+        document.getElementById('uploadTabBtn').addEventListener('click', () => switchTab('upload'));
+
+        function switchTab(tab) {
+            homeScreen.classList.remove('active');
+            uploadScreen.classList.remove('active');
+            detailScreen.classList.remove('active');
+            readerScreen.classList.remove('active');
+            tabBtns.forEach(b => b.classList.remove('active'));
+            mainTabBar.style.display = 'flex';
+            if (tab === 'home') {
+                homeScreen.classList.add('active');
+                document.getElementById('homeTabBtn').classList.add('active');
+            } else if (tab === 'upload') {
+                uploadScreen.classList.add('active');
+                document.getElementById('uploadTabBtn').classList.add('active');
+            }
+        }
+
+        function hideTabBar() { mainTabBar.style.display = 'none'; }
+
+        // ============ UPLOAD ============
+        document.getElementById('uploadMainBtn').addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', e => { if (e.target.files.length) handleFile(e.target.files[0]); });
+
+        async function handleFile(file) {
+            if (!file.name.match(/\.(pdf|txt)$/i)) { alert('PDF or TXT only'); return; }
+            uploadOverlay.classList.add('active');
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('/api/upload', { method: 'POST', body: formData });
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let buffer = '';
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop() || '';
+
+                    for (const line of lines) {
+                        if (!line.trim()) continue;
+                        try {
+                            const data = JSON.parse(line);
+                            if (data.icon) progressSpinner.textContent = data.icon;
+                            if (data.message) progressText.textContent = data.message;
+                            if (data.progress !== undefined) progressBarFill.style.width = data.progress + '%';
+                            if (data.stage === 'complete' && data.success) {
+                                sessionId = data.session_id;
+                                totalSections = data.total_chunks;
+                                bookTitle = data.title;
+                                bookAuthor = '';
+                                currentBookGradient = gradients[0];
+                                await new Promise(r => setTimeout(r, 600));
+                                startReader();
+                            }
+                            if (data.stage === 'error') throw new Error(data.message);
+                        } catch (e) { console.warn(e); }
+                    }
+                }
+            } catch (error) {
+                progressSpinner.textContent = '😱';
+                progressText.textContent = error.message || 'Upload failed';
+                setTimeout(resetUpload, 3000);
+            }
+        }
+
+        function resetUpload() {
+            uploadOverlay.classList.remove('active');
+            progressBarFill.style.width = '0%';
+            progressText.textContent = 'Processing your book...';
+            progressSpinner.textContent = '📖';
+        }
+
+        // ============ LIBRARY ============
+        async function loadLibrary() {
+            try {
+                const res = await fetch('/api/books');
+                const data = await res.json();
+                renderLibrary(data.books || []);
+            } catch (e) { console.error(e); }
+        }
+
+        const gradients = [
+            'linear-gradient(145deg, #4a7a00 0%, #2d5500 50%, #1a3300 100%)',
+            'linear-gradient(145deg, #3d6b00 0%, #2a4a00 50%, #1a2e00 100%)',
+            'linear-gradient(145deg, #5a8a10 0%, #3d6500 50%, #1e3300 100%)',
+            'linear-gradient(145deg, #2d6b2d 0%, #1a4a1a 50%, #0a2e0a 100%)',
+            'linear-gradient(145deg, #6b8a00 0%, #4a6500 50%, #2e3d00 100%)',
+            'linear-gradient(145deg, #3a5a0a 0%, #2a4500 50%, #1a2800 100%)',
+            'linear-gradient(145deg, #4a8a2a 0%, #336b1a 50%, #1a4008 100%)',
+            'linear-gradient(145deg, #5a7a20 0%, #3d5510 50%, #223308 100%)',
+        ];
+
+        function renderLibrary(books) {
+            const countEl = document.getElementById('bookCount');
+            countEl.textContent = books.length > 0 ? `${books.length} Books` : '';
+
+            if (books.length === 0) {
+                bookGrid.innerHTML = `<div class="empty" style="grid-column: 1/-1"><div class="empty-icon">📚</div><div class="empty-text">No books yet.<br>Tap + to upload your first adventure!</div></div>`;
+                bookList.innerHTML = '';
+                document.getElementById('allBooksHead').style.display = 'none';
+                return;
+            }
+
+            // Grid view (top books)
+            bookGrid.innerHTML = books.slice(0, 6).map((book, i) => {
+                const grad = gradients[i % gradients.length];
+                const coverImg = book.cover_url ? `<img src="${book.cover_url}" alt="${esc(book.title)}" onerror="this.remove()">` : '';
+                return `
+                <div class="book-cell" onclick="openDetail('${book.id}', '${esc(book.title)}', '${esc(book.author || '')}', ${book.total_chunks}, '${grad}', ${book.cover_url ? `'${book.cover_url}'` : 'null'}, ${book.summary ? `'${esc(book.summary)}'` : 'null'}, ${book.tags ? `'${esc(book.tags)}'` : 'null'})">
+                    <div class="book-cover" style="background: ${grad}">
+                        ${coverImg}
+                        ${!book.cover_url ? `<div class="book-cover-inner">
+                            <div class="book-cover-title">${book.title}</div>
+                            <div class="book-cover-author">${book.author || 'Unknown'}</div>
+                        </div>` : ''}
+                    </div>
+                    <div class="book-name">${book.title}</div>
+                    <div class="book-author">${book.author || 'Unknown'}</div>
+                </div>`;
+            }).join('');
+
+            // List view (all books if more than 6)
+            if (books.length > 6) {
+                document.getElementById('allBooksHead').style.display = 'flex';
+                bookList.innerHTML = books.slice(6).map((book, i) => {
+                    const gi = (i + 6) % gradients.length;
+                    const rowCover = book.cover_url
+                        ? `<img src="${book.cover_url}" alt="${esc(book.title)}" onerror="this.parentElement.innerHTML='<div class=\\'book-row-cover-inner\\' style=\\'background:${gradients[gi]};border-radius:6px\\'><span>${esc(book.title).substring(0,20)}</span></div>'">`
+                        : `<div class="book-row-cover-inner" style="background: ${gradients[gi]}; border-radius: 6px;"><span>${book.title.substring(0, 20)}</span></div>`;
+                    return `
+                    <div class="book-row" onclick="openDetail('${book.id}', '${esc(book.title)}', '${esc(book.author || '')}', ${book.total_chunks}, '${gradients[gi]}', ${book.cover_url ? `'${book.cover_url}'` : 'null'}, ${book.summary ? `'${esc(book.summary)}'` : 'null'}, ${book.tags ? `'${esc(book.tags)}'` : 'null'})">
+                        <div class="book-row-cover">${rowCover}</div>
+                        <div class="book-row-info">
+                            <div class="book-row-title">${book.title}</div>
+                            <div class="book-row-meta">${book.author || 'Unknown'}</div>
+                            <div class="book-row-stats"><span>${book.total_chunks} sections</span></div>
+                        </div>
+                    </div>`;
+                }).join('');
+            } else {
+                document.getElementById('allBooksHead').style.display = 'none';
+                bookList.innerHTML = '';
+            }
+        }
+
+        function esc(s) { return (s || '').replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
+
+        // ============ BOOK DETAIL ============
+        function openDetail(bookId, title, author, chunks, gradient, coverUrl, summary, tags) {
+            currentBookId = bookId;
+            bookTitle = title;
+            bookAuthor = author;
+            totalSections = chunks;
+            currentBookGradient = gradient;
+            currentBookCover = coverUrl || null;
+
+            const detailCover = document.getElementById('detailCover');
+            if (currentBookCover) {
+                detailCover.innerHTML = `<img src="${currentBookCover}" alt="${title}" onerror="this.remove()">`;
+            } else {
+                detailCover.innerHTML = `<div class="detail-cover-inner" id="detailCoverInner" style="background: ${gradient}">
+                    <div class="detail-cover-title" id="detailCoverTitle">${title}</div>
+                    <div class="detail-cover-author" id="detailCoverAuthor">${author || 'Unknown'}</div>
+                </div>`;
+            }
+            document.getElementById('detailTitle').textContent = title;
+            document.getElementById('detailAuthor').innerHTML = `<svg viewBox="0 0 24 24" fill="currentColor" style="width:14px;height:14px;color:var(--accent)"><circle cx="12" cy="12" r="10"/></svg> ${author || 'Unknown'}`;
+            document.getElementById('detailOverview').textContent = summary || 'Your choices shape the story. No two adventures are ever the same.';
+
+            // Render tags
+            let tagList = [];
+            try { if (tags) tagList = JSON.parse(tags); } catch(e) {}
+            const tagsEl = document.getElementById('detailTags');
+            tagsEl.innerHTML = tagList.length > 0
+                ? tagList.map(t => `<span class="detail-tag">${t}</span>`).join('')
+                : '<span class="detail-tag">Interactive Fiction</span>';
+
+            homeScreen.classList.remove('active');
+            uploadScreen.classList.remove('active');
+            detailScreen.classList.add('active');
+            hideTabBar();
+        }
+
+        document.getElementById('detailBackBtn').addEventListener('click', () => {
+            switchTab('home');
+        });
+
+        document.getElementById('detailPlayBtn').addEventListener('click', async () => {
+            try {
+                const res = await fetch(`/api/books/${currentBookId}/start`, { method: 'POST' });
+                if (!res.ok) throw new Error('Failed');
+                const data = await res.json();
+                sessionId = data.session_id;
+                totalSections = data.total_chunks;
+                bookTitle = data.title;
+                detailScreen.classList.remove('active');
+                startReader();
+            } catch (e) { alert('Failed: ' + e.message); }
+        });
+
+        document.getElementById('detailEditBtn').addEventListener('click', () => {
+            openEditModal(currentBookId, bookTitle, bookAuthor);
+        });
+
+        // ============ DELETE MODAL ============
+        const deleteModal = document.getElementById('deleteModal');
+        const deleteConfirmInput = document.getElementById('deleteConfirmInput');
+        const deleteConfirmBtn = document.getElementById('deleteConfirmBtn');
+
+        document.getElementById('detailDeleteBtn').addEventListener('click', () => {
+            document.getElementById('deleteModalMsg').textContent = `This will permanently remove "${bookTitle}" and all its data. This action cannot be undone.`;
+            deleteConfirmInput.value = '';
+            deleteConfirmBtn.disabled = true;
+            deleteModal.classList.add('active');
+            setTimeout(() => deleteConfirmInput.focus(), 100);
+        });
+
+        deleteConfirmInput.addEventListener('input', () => {
+            deleteConfirmBtn.disabled = deleteConfirmInput.value.trim() !== 'DELETE';
+        });
+
+        function closeDeleteModal() {
+            deleteModal.classList.remove('active');
+            deleteConfirmInput.value = '';
+            deleteConfirmBtn.disabled = true;
+        }
+
+        async function confirmDelete() {
+            if (deleteConfirmInput.value.trim() !== 'DELETE') return;
+            try {
+                await fetch(`/api/books/${currentBookId}`, { method: 'DELETE' });
+                closeDeleteModal();
+                loadLibrary();
+                switchTab('home');
+            } catch (e) { alert(e.message); }
+        }
+
+        deleteModal.addEventListener('click', e => { if (e.target === deleteModal) closeDeleteModal(); });
+
+        function openEditModal(bookId, title, author) {
+            document.getElementById('editBookId').value = bookId;
+            document.getElementById('editTitle').value = title;
+            document.getElementById('editAuthor').value = author;
+            editModal.classList.add('active');
+        }
+        function closeEditModal() { editModal.classList.remove('active'); }
+
+        async function saveBookEdit() {
+            const bookId = document.getElementById('editBookId').value;
+            const title = document.getElementById('editTitle').value.trim();
+            const author = document.getElementById('editAuthor').value.trim();
+            if (!title) return;
+            try {
+                await fetch(`/api/books/${bookId}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title, author: author || null })
+                });
+                closeEditModal();
+                // Update detail screen if open
+                bookTitle = title;
+                bookAuthor = author;
+                const coverTitleEl = document.getElementById('detailCoverTitle');
+                if (coverTitleEl) coverTitleEl.textContent = title;
+                const coverAuthorEl = document.getElementById('detailCoverAuthor');
+                if (coverAuthorEl) coverAuthorEl.textContent = author || 'Unknown';
+                document.getElementById('detailTitle').textContent = title;
+                loadLibrary();
+            } catch (e) { alert(e.message); }
+        }
+
+        // ============ READER ============
+        function startReader() {
+            homeScreen.classList.remove('active');
+            uploadScreen.classList.remove('active');
+            detailScreen.classList.remove('active');
+            readerScreen.classList.add('active');
+            hideTabBar();
+            playerTitle.textContent = bookTitle;
+            document.getElementById('playerAuthor').textContent = bookAuthor || 'Interactive Adventure';
+
+            // Set player cover
+            const playerCoverEl = document.getElementById('playerCover');
+            if (currentBookCover) {
+                playerCoverEl.innerHTML = `<img src="${currentBookCover}" alt="${bookTitle}">`;
+            } else {
+                playerCoverEl.innerHTML = `<div class="player-book-cover-inner" id="playerCoverInner" style="background: ${currentBookGradient}"><span>${bookTitle.substring(0, 15)}</span></div>`;
+            }
+
+            updateMeta();
+            disableChoices();
+            resetUpload();
+            sendMessage(null, true);
+        }
+
+        function updateMeta() {
+            playerChapter.textContent = `Section ${currentSection} / ${totalSections}`;
+        }
+
+        backBtn.addEventListener('click', () => {
+            stopAudio();
+            resetUpload();
+            loadLibrary();
+            switchTab('home');
+        });
+
+        document.getElementById('shareBtn').addEventListener('click', async () => {
+            const shareData = {
+                title: `${bookTitle} - Rabbithole`,
+                text: `I'm on an interactive audio adventure through "${bookTitle}" on Rabbithole — The Infinite Interactive Audiobook, powered by NVIDIA Nemotron!`,
+                url: window.location.href
+            };
+            try {
+                if (navigator.share) {
+                    await navigator.share(shareData);
+                } else {
+                    await navigator.clipboard.writeText(`${shareData.text}\n${shareData.url}`);
+                    const btn = document.getElementById('shareBtn');
+                    btn.style.color = 'var(--nvidia-green)';
+                    setTimeout(() => btn.style.color = '', 1500);
+                }
+            } catch (e) { /* user cancelled */ }
+        });
+
+        async function sendMessage(userInput, isStart = false) {
+            stopAudio();
+            loadingOverlay.classList.add('active');
+            disableChoices();
+
+            try {
+                const response = await fetch('/api/adventure', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ session_id: sessionId, user_input: userInput })
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.detail || 'Error');
+                if (!data.response) throw new Error('No response');
+
+                currentSection = data.current_section;
+                totalSections = data.total_sections;
+                updateMeta();
+                displayStory(data.response);
+            } catch (error) {
+                storyText.innerHTML = '<span class="line current">Something went wrong. Try again.</span>';
+                currentChoices = ['Try again', 'Go back', 'Restart'];
+                enableChoices();
+                loadingOverlay.classList.remove('active');
+            }
+        }
+
+        function displayStory(text) {
+            loadingOverlay.classList.remove('active');
+
+            const choiceRegex = /(\d)\.\s*(.+?)(?=\d\.|$)/gs;
+            const matches = [...text.matchAll(choiceRegex)];
+            let narrative = text;
+            currentChoices = [];
+
+            if (matches.length >= 2) {
+                const firstIdx = text.search(/\d\.\s/);
+                if (firstIdx > 0) narrative = text.substring(0, firstIdx).trim();
+                matches.forEach((m, i) => { if (i < 3) currentChoices.push(m[2].trim()); });
+            } else {
+                currentChoices = ['Continue forward', 'Look around', 'Go back'];
+            }
+
+            storyLines = narrative.split(/(?<=[.!?])\s+/).filter(s => s.trim());
+            currentLineIndex = 0;
+            calculateLineTimings();
+            renderStoryLines(true);
+            enableChoices();
+
+            estimatedDuration = Math.max(5, Math.ceil(narrative.split(' ').length / 2.5));
+            durationEl.textContent = formatTime(estimatedDuration);
+            currentTimeVal = 0;
+            currentTimeEl.textContent = '0:00';
+            progressFill.style.width = '0%';
+
+            playAudio(narrative);
+        }
+
+        function renderStoryLines(initial = false) {
+            storyText.innerHTML = storyLines.map((line, i) => {
+                const diff = i - currentLineIndex;
+                let cls = 'line';
+                if (diff < 0) cls += ' passed';
+                else if (diff === 0) cls += ' current';
+                else {
+                    cls += ' upcoming';
+                    if (diff === 1) cls += ' upcoming-1';
+                    else if (diff === 2) cls += ' upcoming-2';
+                    else if (diff === 3) cls += ' upcoming-3';
+                    else cls += ' upcoming-far';
+                }
+                return `<span class="${cls}" data-index="${i}">${line}</span>`;
+            }).join('');
+
+            if (initial) requestAnimationFrame(() => scrollToCurrent(false));
+            else scrollToCurrent(true);
+        }
+
+        function scrollToCurrent(animate = true) {
+            const wrapper = document.querySelector('.story-text-wrapper');
+            const cur = storyText.querySelector('.line.current');
+            if (!wrapper || !cur) return;
+            const targetY = cur.offsetTop - (wrapper.clientHeight * 0.35) + (cur.offsetHeight / 2);
+            storyText.style.transition = animate ? 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)' : 'none';
+            storyText.style.transform = `translateY(-${Math.max(0, targetY)}px)`;
+        }
+
+        function calculateLineTimings() {
+            const total = storyLines.reduce((s, l) => s + l.length, 0);
+            lineTimings = [];
+            let cum = 0;
+            storyLines.forEach(line => {
+                const w = line.length / total;
+                lineTimings.push({ start: cum, end: cum + w });
+                cum += w;
+            });
+        }
+
+        function updateCurrentLine(progress) {
+            let idx = 0;
+            for (let i = 0; i < lineTimings.length; i++) {
+                if (progress >= lineTimings[i].start && progress < lineTimings[i].end) { idx = i; break; }
+                if (progress >= lineTimings[i].end) idx = i + 1;
+            }
+            idx = Math.min(idx, storyLines.length - 1);
+            if (idx !== currentLineIndex) {
+                currentLineIndex = idx;
+                storyText.querySelectorAll('.line').forEach((el, i) => {
+                    const d = i - currentLineIndex;
+                    el.className = 'line';
+                    if (d < 0) el.classList.add('passed');
+                    else if (d === 0) el.classList.add('current');
+                    else {
+                        el.classList.add('upcoming');
+                        if (d === 1) el.classList.add('upcoming-1');
+                        else if (d === 2) el.classList.add('upcoming-2');
+                        else if (d === 3) el.classList.add('upcoming-3');
+                        else el.classList.add('upcoming-far');
+                    }
+                });
+                scrollToCurrent(true);
+            }
+        }
+
+        // ============ CHOICES ============
+        function enableChoices() {
+            choiceIcons.querySelectorAll('.choice-btn').forEach((b, i) => b.disabled = i >= currentChoices.length);
+        }
+        function disableChoices() {
+            choiceIcons.querySelectorAll('.choice-btn').forEach(b => b.disabled = true);
+        }
+
+        choiceIcons.addEventListener('click', e => {
+            const btn = e.target.closest('.choice-btn');
+            if (!btn || btn.disabled) return;
+            selectedChoiceIndex = parseInt(btn.dataset.choice) - 1;
+            if (currentChoices[selectedChoiceIndex]) {
+                document.getElementById('choiceModalNumber').textContent = selectedChoiceIndex + 1;
+                document.getElementById('choiceModalText').textContent = currentChoices[selectedChoiceIndex];
+                choiceModal.classList.add('active');
+            }
+        });
+
+        function closeChoiceModal() { choiceModal.classList.remove('active'); selectedChoiceIndex = null; }
+
+        function confirmChoice() {
+            if (selectedChoiceIndex !== null && currentChoices[selectedChoiceIndex]) {
+                const text = `${selectedChoiceIndex + 1}. ${currentChoices[selectedChoiceIndex]}`;
+                closeChoiceModal();
+                sendMessage(text);
+            }
+        }
+
+        // ============ AUDIO ============
+        async function playAudio(text, voice = 'narrator') {
+            stopAudio();
+            try {
+                const response = await fetch('/api/tts', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text, voice })
+                });
+                if (!response.ok) throw new Error('TTS failed');
+                const data = await response.json();
+                if (!data.audio_data) throw new Error('No audio');
+
+                const blob = base64ToBlob(data.audio_data, 'audio/mpeg');
+                currentAudio = new Audio(URL.createObjectURL(blob));
+
+                currentAudio.onloadedmetadata = () => {
+                    estimatedDuration = currentAudio.duration || 10;
+                    durationEl.textContent = formatTime(estimatedDuration);
+                };
+                currentAudio.onplay = () => { isPlaying = true; isSpeaking = true; updatePlayBtn(); startProgress(); };
+                currentAudio.onended = () => {
+                    isPlaying = false; isSpeaking = false; updatePlayBtn();
+                    clearInterval(progressInterval);
+                    progressFill.style.width = '100%';
+                    currentLineIndex = storyLines.length - 1;
+                    renderStoryLines();
+                };
+                currentAudio.onerror = () => { isPlaying = false; isSpeaking = false; updatePlayBtn(); };
+                await currentAudio.play();
+            } catch (e) { console.error('TTS:', e); }
+        }
+
+        function startProgress() {
+            clearInterval(progressInterval);
+            progressInterval = setInterval(() => {
+                if (currentAudio && !currentAudio.paused) {
+                    currentTimeVal = currentAudio.currentTime;
+                    const dur = currentAudio.duration || estimatedDuration;
+                    const p = currentTimeVal / dur;
+                    progressFill.style.width = (p * 100) + '%';
+                    currentTimeEl.textContent = formatTime(currentTimeVal);
+                    updateCurrentLine(p);
+                }
+            }, 100);
+        }
+
+        function stopAudio() {
+            if (currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; currentAudio = null; }
+            isPlaying = false; isSpeaking = false; updatePlayBtn(); clearInterval(progressInterval);
+        }
+
+        function togglePlay() {
+            if (currentAudio) {
+                if (currentAudio.paused) { currentAudio.play(); isPlaying = true; startProgress(); }
+                else { currentAudio.pause(); isPlaying = false; clearInterval(progressInterval); }
+                updatePlayBtn();
+            } else if (storyLines.length) playAudio(storyLines.join(' '));
+        }
+
+        function updatePlayBtn() {
+            playIcon.style.display = isPlaying ? 'none' : 'block';
+            pauseIcon.style.display = isPlaying ? 'block' : 'none';
+        }
+
+        function formatTime(s) {
+            const m = Math.floor(s / 60);
+            const sec = Math.floor(s % 60);
+            return `${m}:${sec < 10 ? '0' : ''}${sec}`;
+        }
+
+        playPauseBtn.addEventListener('click', togglePlay);
+
+        function base64ToBlob(b64, mime) {
+            const chars = atob(b64);
+            const bytes = new Uint8Array(chars.length);
+            for (let i = 0; i < chars.length; i++) bytes[i] = chars.charCodeAt(i);
+            return new Blob([bytes], { type: mime });
+        }
+
+        // ============ INIT ============
+        loadLibrary();
+        editModal.addEventListener('click', e => { if (e.target === editModal) closeEditModal(); });
+        choiceModal.addEventListener('click', e => { if (e.target === choiceModal) closeChoiceModal(); });
+    </script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+fastapi==0.129.0
+uvicorn==0.40.0
+httpx==0.28.1
+pydantic==2.12.5
+python-dotenv==1.2.1
+python-multipart==0.0.22
+edge-tts==7.2.7
+PyPDF2==3.0.1

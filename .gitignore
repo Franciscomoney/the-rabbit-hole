@@ -1,0 +1,26 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# Environment & secrets
+.env
+!.env.example
+
+# Database
+*.db
+
+# Generated covers
+static/covers/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# PM2
+ecosystem.config.js
