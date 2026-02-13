@@ -19,12 +19,13 @@ Upload Book → Chunk & Embed → Play Adventure → Listen & Choose → Story B
               semantic vectors    generates story   narrates     shape the path
 ```
 
-1. **Upload** any book (PDF or plain text)
-2. The text is split into semantic chunks and embedded using **NVIDIA NV-EmbedQA-E5-v5**
-3. Hit play — **NVIDIA Nemotron 30B** reads the relevant passages and generates an interactive narrative in second person
-4. **Edge TTS** narrates the story with expressive voices
-5. You pick from 3 choices at every turn — the AI weaves your decision into the next passage
-6. The adventure continues, drawing from the actual book content, until you've explored the whole story
+1. **Upload** any book (PDF or plain text) — drag & drop or tap to select
+2. **Nemotron extracts** the real book title and author from the text automatically
+3. The text is split into semantic chunks and embedded using **NVIDIA NV-EmbedQA-E5-v5**
+4. Hit play — **NVIDIA Nemotron 30B** reads the relevant passages and generates an interactive narrative in second person
+5. **Edge TTS** narrates the story with expressive voices
+6. You pick from 3 choices at every turn — the AI weaves your decision into the next passage
+7. The adventure continues, drawing from the actual book content, until you've explored the whole story
 
 ---
 
@@ -32,7 +33,7 @@ Upload Book → Chunk & Embed → Play Adventure → Listen & Choose → Story B
 
 | Model | Role | API |
 |-------|------|-----|
-| **[nvidia/nemotron-3-nano-30b-a3b](https://build.nvidia.com/nvidia/nemotron-3-nano-30b-a3b)** | Story generation, interactive narrative, book summaries, tag extraction | OpenRouter |
+| **[nvidia/nemotron-3-nano-30b-a3b](https://build.nvidia.com/nvidia/nemotron-3-nano-30b-a3b)** | Story generation, interactive narrative, title/author extraction, book summaries, tag extraction | OpenRouter |
 | **[nvidia/nv-embedqa-e5-v5](https://build.nvidia.com/nvidia/nv-embedqa-e5-v5)** | Semantic text embeddings for RAG-based passage retrieval | NVIDIA NIM API |
 
 ### Why These Models?
@@ -84,16 +85,17 @@ Upload Book → Chunk & Embed → Play Adventure → Listen & Choose → Story B
 
 ## Features
 
-- **Upload any book** — PDF or TXT, any length
+- **Upload any book** — PDF or TXT, drag & drop or tap to select
+- **Smart title extraction** — Nemotron reads the first page and extracts the real book title and author
 - **AI-generated covers** — beautiful book covers created automatically on upload
 - **AI-generated summaries** — hook-style descriptions that make you the protagonist
 - **Smart topic tags** — 3 AI-extracted themes per book
 - **Interactive audio playback** — narrated with synchronized text highlighting (Apple Music lyrics style)
-- **Choose-your-own-adventure** — 3 choices at every turn, confirmed via modal
+- **Choose-your-own-adventure** — 3 choices at every turn, confirmed via slide-up modal
 - **Session persistence** — continue where you left off
 - **Voice input** — speak your choices (optional, requires Whisper STT endpoint)
 - **Share** — native Web Share API on mobile, clipboard fallback on desktop
-- **Mobile-first design** — NVIDIA green color scheme, tab navigation, smooth animations
+- **Dark glassmorphism UI** — NVIDIA green accent, frosted glass cards, smooth animations
 - **No build step** — pure HTML/CSS/JS frontend, just serve it
 - **Zero dependencies frontend** — no React, no npm, no bundler
 

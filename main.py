@@ -254,6 +254,79 @@ Respond with ONLY the JSON object."""
         logger.error(f"Summary generation error: {e}")
 
 
+async def extract_book_title(first_chunk: str, filename: str) -> dict:
+    """Use Nemotron to extract the real book title and author from the text."""
+    if not OPENROUTER_API_KEY:
+        return {"title": os.path.splitext(filename)[0], "author": ""}
+
+    # Use first ~1500 chars which typically contain title page info
+    sample = first_chunk[:1500]
+
+    prompt = f"""Look at this text from the beginning of a book file named "{filename}".
+Extract the actual book title and author name.
+
+Text:
+{sample}
+
+Respond with ONLY this JSON format, nothing else:
+{{"title": "The Actual Book Title", "author": "Author Name"}}
+
+Rules:
+- Extract the REAL title from the text content, not the filename
+- If you can identify the author, include it. If not, use empty string ""
+- Clean up the title: proper capitalization, no extra whitespace
+- If you truly cannot determine the title from the text, use the filename without extension"""
+
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            response = await client.post(
+                "https://openrouter.ai/api/v1/chat/completions",
+                headers={
+                    "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+                    "Content-Type": "application/json"
+                },
+                json={
+                    "model": "nvidia/nemotron-3-nano-30b-a3b",
+                    "messages": [
+                        {"role": "system", "content": "You extract book metadata. Always respond with valid JSON only."},
+                        {"role": "user", "content": prompt}
+                    ],
+                    "temperature": 0.3,
+                    "max_tokens": 500,
+                    "min_tokens": 10
+                }
+            )
+
+        if response.status_code != 200:
+            logger.error(f"Title extraction failed: {response.status_code}")
+            return {"title": os.path.splitext(filename)[0], "author": ""}
+
+        data = response.json()
+        msg = data["choices"][0]["message"]
+        raw = (msg.get("content") or "").strip()
+        reasoning = (msg.get("reasoning") or "").strip()
+
+        json_str = raw
+        if not json_str:
+            import re
+            json_match = re.search(r'\{[^{}]*"title"[^{}]*\}', reasoning)
+            if json_match:
+                json_str = json_match.group(0)
+
+        if json_str:
+            result = json.loads(json_str)
+            title = result.get("title", "").strip()
+            author = result.get("author", "").strip()
+            if title:
+                logger.info(f"Extracted title: '{title}', author: '{author}'")
+                return {"title": title, "author": author}
+
+    except Exception as e:
+        logger.error(f"Title extraction error: {e}")
+
+    return {"title": os.path.splitext(filename)[0], "author": ""}
+
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -322,6 +395,7 @@ async def upload_book(file: UploadFile = File(...)):
             # Generate book ID
             book_id = str(uuid.uuid4())[:8]
             title = os.path.splitext(filename)[0]
+            author = ""
 
             # Stage 2: Chunking
             logger.info("Stage: Chunking")
@@ -342,6 +416,19 @@ async def upload_book(file: UploadFile = File(...)):
                     "icon": "😿"
                 }) + "\n"
                 return
+
+            # Extract real title and author from the text
+            yield json.dumps({
+                "stage": "extracting_title",
+                "progress": 25,
+                "message": "Reading the title page...",
+                "icon": "📖"
+            }) + "\n"
+
+            title_info = await extract_book_title(chunks[0], filename)
+            title = title_info["title"]
+            author = title_info["author"]
+            logger.info(f"Book title: '{title}', author: '{author}'")
 
             yield json.dumps({
                 "stage": "chunking_done",
@@ -398,7 +485,7 @@ async def upload_book(file: UploadFile = File(...)):
             }) + "\n"
 
             # Save to database
-            save_book(book_id, title, filename, len(chunks))
+            save_book(book_id, title, filename, len(chunks), author=author)
 
             for i, (chunk, embedding) in enumerate(zip(chunks, all_embeddings)):
                 save_chunk(book_id, i, chunk, embedding)
@@ -425,6 +512,7 @@ async def upload_book(file: UploadFile = File(...)):
                 "book_id": book_id,
                 "session_id": session_id,
                 "title": title,
+                "author": author,
                 "total_chunks": len(chunks)
             }) + "\n"
 

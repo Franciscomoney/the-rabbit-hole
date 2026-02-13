@@ -82,13 +82,13 @@ def init_db():
     conn.commit()
     conn.close()
 
-def save_book(book_id: str, title: str, filename: str, total_chunks: int):
+def save_book(book_id: str, title: str, filename: str, total_chunks: int, author: str = ""):
     """Save book metadata."""
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute(
-        'INSERT OR REPLACE INTO books (id, title, filename, total_chunks) VALUES (?, ?, ?, ?)',
-        (book_id, title, filename, total_chunks)
+        'INSERT OR REPLACE INTO books (id, title, filename, total_chunks, author) VALUES (?, ?, ?, ?, ?)',
+        (book_id, title, filename, total_chunks, author or "")
     )
     conn.commit()
     conn.close()
