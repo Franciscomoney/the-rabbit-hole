@@ -1043,7 +1043,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 0 32px;
+            padding: 0 76px 0 24px;
             position: relative;
             overflow: hidden;
         }
@@ -1096,19 +1096,23 @@
         .story-text .line.upcoming-3 { opacity: 0.15; transform: scale(0.93); filter: blur(1.2px); }
         .story-text .line.upcoming-far { opacity: 0.06; transform: scale(0.91); filter: blur(1.8px); }
 
-        /* Choice buttons - horizontal row inside player */
+        /* Choice buttons - floating vertical stack on right */
         .choices {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
             display: flex;
-            justify-content: center;
-            gap: 14px;
-            padding: 8px 0 4px;
+            flex-direction: column;
+            gap: 16px;
+            z-index: 10;
         }
 
         .choice-btn {
-            width: 50px;
-            height: 50px;
+            width: 48px;
+            height: 48px;
             border-radius: 50%;
-            background: rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.08);
             backdrop-filter: blur(8px);
             border: 1px solid var(--glass-border);
             color: white;
@@ -1131,61 +1135,22 @@
         }
         .choice-btn:disabled { opacity: 0.25; cursor: not-allowed; }
         .choice-btn:disabled:hover {
-            background: rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.08);
             border-color: var(--glass-border);
             color: white;
             transform: none;
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
 
-        /* Player */
-        .player { padding: 0 20px 20px; }
+        /* Player — minimal bottom bar */
+        .player { padding: 0 16px 16px; }
 
-        .player-book {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 14px;
-            background: rgba(255,255,255,0.06);
-            border: 1px solid var(--glass-border);
-            border-radius: 14px;
-            margin-bottom: 14px;
-        }
+        .player-book { display: none; }
 
-        .player-book-cover {
-            width: 42px;
-            height: 56px;
-            border-radius: 6px;
-            flex-shrink: 0;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-        }
-
-        .player-book-cover-inner {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 4px;
-            position: relative;
-        }
-
-        .player-book-cover-inner span {
-            font-family: 'Merriweather', serif;
-            font-size: 0.45rem;
-            font-weight: 700;
-            color: white;
-            text-align: center;
-            line-height: 1.2;
-        }
-
-        .player-book-cover img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 6px;
-        }
+        .player-book-cover { display: none; }
+        .player-book-cover-inner { display: none; }
+        .player-book-cover-inner span { display: none; }
+        .player-book-cover img { display: none; }
 
         .player-book-info { flex: 1; min-width: 0; }
         .player-book-title {
@@ -1201,21 +1166,20 @@
             color: rgba(255,255,255,0.4);
         }
         .player-chapter-info {
-            text-align: right;
             font-size: 0.62rem;
             color: rgba(255,255,255,0.3);
             white-space: nowrap;
         }
 
         /* Progress */
-        .progress-area { margin-bottom: 4px; }
+        .progress-area { margin-bottom: 8px; }
         .progress {
             width: 100%;
             height: 3px;
             background: rgba(255,255,255,0.1);
             border-radius: 2px;
             cursor: pointer;
-            margin-bottom: 5px;
+            margin-bottom: 0;
         }
         .progress-fill {
             height: 100%;
@@ -1225,16 +1189,33 @@
             transition: width 0.1s linear;
             box-shadow: 0 0 6px var(--primary);
         }
-        .time-row { display: flex; justify-content: space-between; }
+        .time-row { display: none; }
         .time-label { font-size: 0.65rem; color: rgba(255,255,255,0.35); font-weight: 500; }
 
-        /* Transport controls */
+        /* Bottom bar — title left, play right */
         .controls {
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
-            gap: 24px;
-            padding-top: 8px;
+            gap: 12px;
+        }
+
+        .bottom-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .bottom-info-title {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: white;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .bottom-info-section {
+            font-size: 0.68rem;
+            color: var(--primary);
+            opacity: 0.7;
         }
 
         .ctrl-btn {
@@ -1250,8 +1231,8 @@
         .ctrl-btn svg { width: 22px; height: 22px; }
 
         .play-btn {
-            width: 56px;
-            height: 56px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
             background: var(--primary);
             color: var(--bg-deep);
@@ -1260,6 +1241,7 @@
             justify-content: center;
             box-shadow: 0 0 20px rgba(163, 255, 172, 0.3);
             transition: transform 0.15s;
+            flex-shrink: 0;
         }
         .play-btn:hover { transform: scale(1.05); }
         .play-btn svg { width: 22px; height: 22px; }
@@ -1745,14 +1727,17 @@
                 <div class="story-text-wrapper">
                     <div class="story-text" id="storyText"></div>
                 </div>
+                <div class="choices" id="choiceIcons">
+                    <button class="choice-btn" data-choice="1" disabled>1</button>
+                    <button class="choice-btn" data-choice="2" disabled>2</button>
+                    <button class="choice-btn" data-choice="3" disabled>3</button>
+                </div>
             </div>
 
             <div class="player">
-                <div class="player-book">
+                <div class="player-book" style="display:none">
                     <div class="player-book-cover" id="playerCover">
-                        <div class="player-book-cover-inner" id="playerCoverInner">
-                            <span></span>
-                        </div>
+                        <div class="player-book-cover-inner" id="playerCoverInner"><span></span></div>
                     </div>
                     <div class="player-book-info">
                         <div class="player-book-title" id="playerTitle">Book Title</div>
@@ -1771,22 +1756,14 @@
                     </div>
                 </div>
 
-                <div class="choices" id="choiceIcons">
-                    <button class="choice-btn" data-choice="1" disabled>1</button>
-                    <button class="choice-btn" data-choice="2" disabled>2</button>
-                    <button class="choice-btn" data-choice="3" disabled>3</button>
-                </div>
-
                 <div class="controls">
-                    <button class="ctrl-btn" id="rewindBtn">
-                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0019 16V8a1 1 0 00-1.6-.8l-5.333 4zM4.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0011 16V8a1 1 0 00-1.6-.8l-5.334 4z"/></svg>
-                    </button>
+                    <div class="bottom-info">
+                        <div class="bottom-info-title" id="bottomTitle">Book Title</div>
+                        <div class="bottom-info-section" id="bottomSection">Section 1 / 1</div>
+                    </div>
                     <button class="ctrl-btn play-btn" id="playPauseBtn">
                         <svg id="playIcon" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                         <svg id="pauseIcon" fill="currentColor" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-                    </button>
-                    <button class="ctrl-btn" id="forwardBtn">
-                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M11.933 12.8a1 1 0 000-1.6L6.6 7.2A1 1 0 005 8v8a1 1 0 001.6.8l5.333-4zM19.933 12.8a1 1 0 000-1.6l-5.333-4A1 1 0 0013 8v8a1 1 0 001.6.8l5.333-4z"/></svg>
                     </button>
                 </div>
             </div>
@@ -2354,6 +2331,7 @@
             hideTabBar();
             playerTitle.textContent = bookTitle;
             document.getElementById('playerAuthor').textContent = bookAuthor || 'Interactive Adventure';
+            document.getElementById('bottomTitle').textContent = bookTitle;
 
             // Set player cover
             const playerCoverEl = document.getElementById('playerCover');
@@ -2371,6 +2349,7 @@
 
         function updateMeta() {
             playerChapter.textContent = `Section ${currentSection} / ${totalSections}`;
+            document.getElementById('bottomSection').textContent = `Section ${currentSection} / ${totalSections}`;
         }
 
         backBtn.addEventListener('click', () => {
@@ -2439,7 +2418,7 @@
             if (matches.length >= 2) {
                 const firstIdx = text.search(/\d[.)]\s/);
                 if (firstIdx > 0) narrative = text.substring(0, firstIdx).trim();
-                matches.forEach((m, i) => { if (i < 3) currentChoices.push(m[2].trim()); });
+                matches.forEach((m, i) => { if (i < 3) currentChoices.push(m[2].trim().replace(/\*\*/g, '').replace(/\*/g, '').replace(/_/g, '')); });
             }
             // Always ensure exactly 3 choices
             const defaults = ['Continue forward', 'Look around', 'Go back'];
@@ -2447,6 +2426,7 @@
                 currentChoices.push(defaults[currentChoices.length]);
             }
 
+            narrative = narrative.replace(/\*\*/g, '').replace(/\*/g, '').replace(/_/g, '');
             storyLines = narrative.split(/(?<=[.!?])\s+/).filter(s => s.trim());
             currentLineIndex = 0;
             calculateLineTimings();

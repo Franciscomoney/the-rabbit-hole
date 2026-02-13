@@ -91,7 +91,8 @@ Upload Book → Chunk & Embed → Play Adventure → Listen & Choose → Story B
 - **AI-generated summaries** — hook-style descriptions that make you the protagonist
 - **Smart topic tags** — 3 AI-extracted themes per book
 - **Interactive audio playback** — narrated with synchronized text highlighting (Apple Music lyrics style)
-- **Choose-your-own-adventure** — 3 choices at every turn, confirmed via slide-up modal
+- **Choose-your-own-adventure** — 3 choices at every turn, each routed to different book passages via semantic search
+- **Real branching** — choices use embedding similarity to find the most relevant passage, so every path is unique
 - **Session persistence** — continue where you left off
 - **Voice input** — speak your choices (optional, requires Whisper STT endpoint)
 - **Search** — real-time search across titles, authors, and tags
